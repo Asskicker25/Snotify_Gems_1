@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Containers\LinkedList.h" />
     <ClInclude Include="src\Containers\SmartArray.h" />
     <ClInclude Include="src\cMusicGenerator.h" />
     <ClInclude Include="src\cPerson.h" />
