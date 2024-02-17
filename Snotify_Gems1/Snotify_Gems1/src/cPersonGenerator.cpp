@@ -8,60 +8,96 @@
 #include <sstream>		// String Stream
 #include <string>
 
+cPersonGenerator::cPersonGenerator()
+{
+}
+
+cPersonGenerator::~cPersonGenerator()
+{
+
+}
+
 bool cPersonGenerator::LoadCensusFiles(
 	std::string babyNameFile,
 	std::string surnameFile,
 	std::string streetNameFile,
 	std::string& errorString)
 {
-	// TODO: Put YOUR amazing code here!
+
+	if (!ReadCSVFile(babyNameFile, false, [this](std::string value)
+		{
+			mListOfBabyNames.addAtEnd(value);
+		}))
+	{
+		return false;
+	}
+
+
+	if (!ReadCSVFile(surnameFile, true, [this](std::string value)
+		{
+			mListOfSurnames.addAtEnd(value);
+		}))
+	{
+		return false;
+	}
+
+	if (!ReadCSVFile(streetNameFile, true, [this](std::string value)
+		{
+			mListOfStreetName.addAtEnd(value);
+		}))
+	{
+		return false;
+	}
+
+	std::cout << "Name : " << mListOfBabyNames.getAt(0) << std::endl;
+	std::cout << "Surname : " << mListOfSurnames.getAt(0) << std::endl;
+	std::cout << "StreetName : " << mListOfStreetName.getAt(0) << std::endl;
+
 	return true;
 }
 
-
-
-// Here's a simple way to load the comma delimited files:
-bool readCSVFile(void)
+bool cPersonGenerator::ReadCSVFile(const std::string& fileName, bool headerAvailable,
+	std::function<void(std::string) > OnLineRead)
 {
-	// Open the file
-	std::ifstream namesFile("Names_2010Census.csv");
-	if (!namesFile.is_open())
+	std::ifstream file(fileName);
+	if (!file.is_open())
 	{
 		std::cout << "Didn't open file" << std::endl;
 		return false;
 	}
 
-	// name,rank,count,prop100k,cum_prop100k,pctwhite,pctblack,pctapi,pctaian,pct2prace,pcthispanic
-	// SMITH,1,2442977,828.19,828.19,70.9,23.11,0.5,0.89,2.19,2.4
-	//
-	// - rank is how popular the last name is, like 1st, 2nd, etc.
-	// - count is how many people have that last name, so 2,442,977 people have last name "Smith"
-	// - prop100k is the ratio per 100,000 people. Smith is 828.19, 
-	//            meaning that there's a 828.19 out of 100,000 chance (0.82819% chance)
-	//            that someone is named "Smith"
-
 	std::string theLine;
 
 	unsigned int lineCount = 0;
-	while (std::getline(namesFile, theLine))
+	while (std::getline(file, theLine))
 	{
+		std::string name;
+
 		lineCount++;
 		std::stringstream ssLine(theLine);
 
-		std::string token;
-		unsigned int tokenCount = 0;
-		while (std::getline(ssLine, token, ','))
+		std::string value;
+		unsigned int index = 0;
+
+		if (headerAvailable && lineCount == 1)
 		{
-			if (tokenCount == 0)
-			{
-				std::cout << token << std::endl;
-			}
-			// Ignore the other parts of the line
-			tokenCount++;
+			continue;
 		}
+
+		while (std::getline(ssLine, value, ','))
+		{
+			if (index == 0)
+			{
+				name = value;
+			}
+			index++;
+		}
+
+		OnLineRead(name);
 	}
 
 	std::cout << "Lines read = " << lineCount << std::endl;
 
 	return true;
 }
+

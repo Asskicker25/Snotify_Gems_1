@@ -2,7 +2,12 @@
 #define _cPersonGenerator_HG_
 
 #include <string>
+#include <functional>
+
 #include "cPerson.h"
+#include "Containers/SmartArray.h"
+
+using namespace Containers;
 
 class cPersonGenerator
 {
@@ -38,6 +43,15 @@ public:
 	// Randomly generates a person from the data
 	// Returns 0, NULL, or nullptr if it can't do this. 
 	cPerson* generateRandomPerson(void);
+
+private: 
+	bool ReadCSVFile(const std::string& fileName, bool headerAvailable, std::function<void(std::string)> OnLineRead);
+
+	SmartArray<std::string> mListOfBabyNames;
+	SmartArray<std::string> mListOfSurnames;
+	SmartArray<std::string> mListOfStreetName;
+
+
 };
 
 
