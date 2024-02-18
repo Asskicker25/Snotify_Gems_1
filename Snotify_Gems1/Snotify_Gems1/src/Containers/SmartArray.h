@@ -11,6 +11,8 @@ namespace Containers
 		~SmartArray();
 
 		void addAtEnd(T data);
+		void addAtIndex(unsigned int index, T data);
+		void removeAt(unsigned int index);
 		T getAt(unsigned int index);
 		unsigned int getSize();
 		void clear();
@@ -51,6 +53,27 @@ namespace Containers
 
 		mData[mSize] = data;
 		mSize++;
+	}
+
+	template<typename T>
+	inline void SmartArray<T>::addAtIndex(unsigned int index, T data)
+	{
+		if (index >= mSize) { __debugbreak(); }
+
+		mData[index] = data;
+	}
+
+	template<typename T>
+	inline void SmartArray<T>::removeAt(unsigned int index)
+	{
+		if (index >= mSize) { return; }
+
+		for (unsigned int i = index; i < mSize - 1; i++)
+		{
+			mData[i] = mData[i + 1];
+		}
+
+		--mSize;
 	}
 
 	template<typename T>

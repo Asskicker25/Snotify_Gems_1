@@ -24,11 +24,18 @@ public:
 	cSong* findSong(std::string songName, std::string artist);
 
 private:
+	bool LoadFromCSV(std::string musicFileName, std::string& errorString);
 
+	void SortSongs();
+	void DeleteDuplicates();
 	void AddSong(const std::string& songName, const std::string& artist);
+
 	int GetRandomIntNumber(int minValue, int maxValue);
-	bool IsDuplicate(const std::string& songName,const  std::string& artist);
+	int QuickSortPartition(SmartArray<cSong*>& songs, int low, int high);
+	unsigned int Hashing(const char* str);
 	
+	void QuickSort(SmartArray<cSong*>& songs, int low, int high);
+
 	SmartArray<cSong*> mListOfSongs;
 
 };

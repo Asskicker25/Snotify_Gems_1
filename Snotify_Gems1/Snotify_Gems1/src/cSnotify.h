@@ -4,6 +4,14 @@
 #include "cPerson.h"
 #include "cSong.h"
 
+#include "Containers/SmartArray.h"
+#include "Containers/LinkedList.h"
+#include "cPersonGenerator.h"
+#include "cMusicGenerator.h"
+#include "Profiler.h"
+
+using namespace Containers;
+
 
 class cSnotify
 {
@@ -80,6 +88,10 @@ public:
 	bool FindUsersFirstLastNames(std::string firstName, std::string lastName, cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray);
 
 
+private:
+
+	cPersonGenerator personGenerator;
+	cMusicGenerator musicGenerator;
 };
 
 #endif // !_cSnotify_HG_

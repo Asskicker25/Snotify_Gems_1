@@ -17,6 +17,53 @@ cMusicGenerator::~cMusicGenerator()
 
 bool cMusicGenerator::LoadMusicInformation(std::string musicFileName, std::string& errorString)
 {
+	if (LoadFromCSV(musicFileName, errorString))
+	{
+		SortSongs();
+		DeleteDuplicates();
+		std::cout << "Size : " << mListOfSongs.getSize() << std::endl;
+
+		/*for (int i = 0; i < mListOfSongs.getSize(); i++)
+		{
+			std::cout << mListOfSongs.getAt(i)->name << std::endl;
+		}*/
+
+		return true;
+	}
+	return false;
+}
+
+cSong* cMusicGenerator::getRandomSong(void)
+{
+	return mListOfSongs.getAt(GetRandomIntNumber(0, mListOfSongs.getSize()));
+}
+
+cSong* cMusicGenerator::findSong(std::string songName, std::string artist)
+{
+	unsigned int hashValue = Hashing((songName + artist).c_str());
+
+	for (int i = 0; i < mListOfSongs.getSize(); i++)
+	{
+		if (mListOfSongs.getAt(i)->getUniqueID() == hashValue)
+		{
+			return mListOfSongs.getAt(i);
+		}
+	}
+
+	return nullptr;
+}
+
+int cMusicGenerator::GetRandomIntNumber(int minValue, int maxValue)
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> distribution(minValue, maxValue);
+
+	return distribution(gen);
+}
+
+bool cMusicGenerator::LoadFromCSV(std::string musicFileName, std::string& errorString)
+{
 	std::ifstream file(musicFileName);
 	if (!file.is_open())
 	{
@@ -55,66 +102,98 @@ bool cMusicGenerator::LoadMusicInformation(std::string musicFileName, std::strin
 			}
 
 			if (index > 4) continue;
-			
+
 			index++;
 		}
 
-		if (!IsDuplicate(songName, artist))
+		/*if (!IsDuplicate(songName, artist))
 		{
-			AddSong(songName, artist);
-		}
+		}*/
+		AddSong(songName, artist);
 
 	}
 	std::cout << "Line : " << lineCount << std::endl;
 	return true;
 }
 
-cSong* cMusicGenerator::getRandomSong(void)
-{
-	return mListOfSongs.getAt(GetRandomIntNumber(0,mListOfSongs.getSize()));
-}
-
-cSong* cMusicGenerator::findSong(std::string songName, std::string artist)
-{
-	for (int i = 0; i < mListOfSongs.getSize(); i++)
-	{
-		if (mListOfSongs.getAt(i)->name == songName && mListOfSongs.getAt(i)->artist == artist)
-		{
-			return mListOfSongs.getAt(i);
-		}
-	}
-
-	return nullptr;
-}
-
-int cMusicGenerator::GetRandomIntNumber(int minValue, int maxValue)
-{
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> distribution(minValue, maxValue);
-
-	return distribution(gen);
-}
-
-bool cMusicGenerator::IsDuplicate(const std::string& songName, const std::string& artist)
-{
-	for (int i = 0; i < mListOfSongs.getSize(); i++)
-	{
-		if (mListOfSongs.getAt(i)->name == songName && mListOfSongs.getAt(i)->artist == artist)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
 void cMusicGenerator::AddSong(const std::string& songName, const std::string& artist)
 {
 	cSong* newSong = new cSong();
-	
+
 	newSong->name = songName;
 	newSong->artist = artist;
+	newSong->uniqueID = Hashing((songName + artist).c_str());
 
 	mListOfSongs.addAtEnd(newSong);
+}
+
+unsigned int cMusicGenerator::Hashing(const char* str)
+{
+	unsigned int hash = 5381;
+	int c;
+
+	while ((c = *str++)) {
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	}
+
+	return hash;
+}
+
+void cMusicGenerator::DeleteDuplicates()
+{
+	SmartArray<int> indicesToRemove;
+
+	int n = mListOfSongs.getSize() - 1;
+	for (int i = 0; i < n; i++)
+	{
+		if (mListOfSongs.getAt(i)->getUniqueID() == mListOfSongs.getAt(i + 1)->getUniqueID())
+		{
+			indicesToRemove.addAtEnd(i);
+		}
+	}
+
+	for (int i = 0; i < indicesToRemove.getSize(); i++)
+	{
+		mListOfSongs.removeAt(indicesToRemove.getAt(i) - (i));
+	}
+}
+
+void cMusicGenerator::SortSongs()
+{
+	QuickSort(mListOfSongs, 0, mListOfSongs.getSize() - 1);
+}
+
+void cMusicGenerator::QuickSort(SmartArray<cSong*>& songs, int low, int high)
+{
+	if (low < high)
+	{
+		int pivot = QuickSortPartition(songs, low, high);
+		QuickSort(songs, low, pivot - 1);
+		QuickSort(songs, pivot + 1, high);
+	}
+}
+
+
+int cMusicGenerator::QuickSortPartition(SmartArray<cSong*>& songs, int low, int high)
+{
+	int pivot = songs.getAt(high)->getUniqueID();
+	int i = low - 1;
+
+	for (int j = low; j < high; j++)
+	{
+		if (songs.getAt(j)->getUniqueID() < pivot)
+		{
+			i++;
+
+			cSong* temp = songs.getAt(i);
+			songs.addAtIndex(i, songs.getAt(j));
+			songs.addAtIndex(j, temp);
+		}
+	}
+
+	cSong* temp = songs.getAt(i + 1);
+	songs.addAtIndex(i + 1, songs.getAt(high));
+	songs.addAtIndex(high, temp);
+	
+	return i + 1;
 }

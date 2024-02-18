@@ -1,5 +1,5 @@
+#include <iostream>
 #include "cSnotify.h"
-
 
 //// This returns a COPY of the users library, in the form of a regular dynamic array.
 //bool cSnotify::GetUsersSongLibrary(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary);
@@ -27,6 +27,34 @@
 //}
 
 bool cSnotify::GetUsersSongLibrary(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
+{
+	return false;
+}
+
+cSnotify::cSnotify()
+{
+	std::string errorMsg;
+
+	personGenerator.LoadCensusFiles(
+		"Assets/BabyName/yob2019.txt",
+		"Assets/Surname/Names_2010Census.csv",
+		"Assets/StreetName/Street_Names.csv", errorMsg);
+
+
+	Profiler profiler;
+
+	profiler.StartTimer();
+	musicGenerator.LoadMusicInformation("Assets/Billboard/hot_stuff_2 - Copy.csv", errorMsg);
+	profiler.EndTimer();
+
+	std::cout << profiler.GetElapsedTime() << std::endl;
+}
+
+cSnotify::~cSnotify()
+{
+}
+
+bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 {
 	return false;
 }
