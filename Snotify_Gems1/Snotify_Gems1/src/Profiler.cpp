@@ -2,6 +2,12 @@
 #include <ctime>
 #include <iostream>
 
+Profiler& Profiler::GetInstance()
+{
+	static Profiler instance;
+	return instance;
+}
+
 void Profiler::StartTimer()
 {
 	mStartTime = std::chrono::high_resolution_clock::now();

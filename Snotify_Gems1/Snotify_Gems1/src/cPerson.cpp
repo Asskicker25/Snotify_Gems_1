@@ -57,3 +57,8 @@ unsigned int cPerson::getSnotifyUniqueUserID(void)
 {
 	return m_Snotify_UniqueUserID;
 }
+
+void cPerson::setSpotifyUniqueUserId(unsigned int id)
+{
+	m_Snotify_UniqueUserID = id;
+}

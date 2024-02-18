@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Profiler.h"
 #include "cSnotify.h"
 
 //// This returns a COPY of the users library, in the form of a regular dynamic array.
@@ -48,24 +49,75 @@ bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 	return true;
 }
 
+bool cSnotify::UpdateUser(cPerson* pPerson, std::string& errorString)
+{
+	int size = mListOfUsers.getSize();
+
+	Node<cPerson*>* currentNode;
+	cPerson* personToUpdate;
+
+	for (int i = 0; i < size; i++)
+	{
+		currentNode = mListOfUsers.mListOfNodes.getAt(i);
+		personToUpdate = currentNode->mData;
+
+		if (personToUpdate->getSnotifyUniqueUserID() == pPerson->getSnotifyUniqueUserID()
+			&& personToUpdate->SIN == pPerson->SIN)
+		{
+			delete currentNode->mData;
+
+			currentNode->mData = pPerson;
+				return true;
+		}
+	}
+
+
+	return false;
+}
+
 
 bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 {
 	if (sizeOfUserArray == 0) { return false; }
 
+	int size = mListOfUsers.getSize();
+
+	if(sizeOfUserArray < size) { return false; }
+
 	pAllTheUsers = new cPerson[sizeOfUserArray];
 
-	mListOfUsers.moveToFirst();
+	std::cout << "Array Iteration " << std::endl;
+	TIMER_CALL(
+		Node<cPerson*>*currentNode;
 
-	int index = 0;
-
-	do
+	for (int i = 0; i < sizeOfUserArray; i++)
 	{
-		pAllTheUsers[index] = *mListOfUsers.getCurrent();
+		currentNode = mListOfUsers.mListOfNodes.getAt(i);
+		pAllTheUsers[i] = *currentNode->mData;
 
-		index++;
+	}
+	);
 
-	} while (mListOfUsers.moveNext() && index < sizeOfUserArray);
+
+	//pAllTheUsers = new cPerson[sizeOfUserArray];
+
+	//std::cout << "List Iteration " << std::endl;
+
+	//TIMER_CALL(
+
+	//	mListOfUsers.moveToFirst();
+
+	//	int index = 0;
+
+	//	do
+	//	{
+	//		pAllTheUsers[index] = *mListOfUsers.getCurrent();
+
+	//		index++;
+
+	//	} while (mListOfUsers.moveNext() && index < sizeOfUserArray);
+	//);
+
 
 	return true;
 }
