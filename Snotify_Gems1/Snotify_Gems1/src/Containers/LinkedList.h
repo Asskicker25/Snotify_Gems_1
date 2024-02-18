@@ -22,6 +22,7 @@ namespace Containers
 		~LinkedList();
 
 		void insertBeforeCurrent(T data);
+		void updateCurrent(T data);
 		void deleteAtCurrent();
 
 		bool isEmpty();
@@ -29,22 +30,22 @@ namespace Containers
 		bool movePrevious();
 		bool deleteElement(T element);
 
+		void deleteNode(Node<T>* node);
 		void moveToFirst();
 		void moveToLast();
 		void clear();
-		
-		inline unsigned int getSize() { return mListOfNodes.getSize(); }
 
+		inline unsigned int getSize() { return mSize; }
+		
 		T getCurrent();
 
-		SmartArray<Node<T>*> mListOfNodes;
-
 	private:
-		void deleteNode(Node<T>* node);
 
 		Node<T>* mHeadNode;
 		Node<T>* mTailNode;
 		Node<T>* mCurrentNode;
+
+		unsigned int mSize = 0; 
 
 	};
 
@@ -76,7 +77,7 @@ namespace Containers
 			mTailNode = newNode;
 			mCurrentNode = mHeadNode;
 
-			mListOfNodes.addAtEnd(newNode);
+			mSize++;
 			return;
 		}
 
@@ -101,7 +102,13 @@ namespace Containers
 			mTailNode = mCurrentNode;
 		}*/
 
-		mListOfNodes.addAtEnd(newNode);
+		mSize++;
+	}
+
+	template<typename T>
+	inline void LinkedList<T>::updateCurrent(T data)
+	{
+		mCurrentNode->mData = data;
 	}
 
 	template<typename T>
@@ -118,25 +125,23 @@ namespace Containers
 	template<typename T>
 	inline bool LinkedList<T>::deleteElement(T element)
 	{
-		SmartArray<int> indices;
+		Node<T>* tempNode = mCurrentNode;
 
-		for (int i = 0; i < mListOfNodes.getSize(); i++)
+		moveToFirst();
+
+		do
 		{
-			if (mListOfNodes.getAt(i)->mData == element)
+			if (getCurrent() == element)
 			{
-				indices.addAtEnd(i);
+				deleteNode(mCurrentNode);
+
+				mCurrentNode = tempNode;
+				return true;
 			}
-		}
 
-		if (indices.getSize() == 0) return false;
+		} while (moveNext());
 
-
-		for (int i = 0; i < indices.getSize(); i++)
-		{
-			deleteNode(mListOfNodes.getAt(indices.getAt(i) - i));
-		}
-
-		return true;
+		return false;
 	}
 
 	template<typename T>
@@ -161,6 +166,8 @@ namespace Containers
 		}
 
 		delete node;
+
+		mSize--;
 	}
 
 	template<typename T>

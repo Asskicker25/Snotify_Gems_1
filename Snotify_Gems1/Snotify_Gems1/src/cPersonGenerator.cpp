@@ -75,8 +75,8 @@ cPerson* cPersonGenerator::generateRandomPerson(void)
 	newPerson->streetName = randomStreet.streetName;
 	newPerson->streetType = randomStreet.streetType;
 	newPerson->streetDirection = randomStreet.streetDirection;
-	newPerson->city = canadaCities[GetRandomIntNumber(0, 10)];
-	newPerson->province = canadaProvinces[GetRandomIntNumber(0, 13)];
+	newPerson->city = cities[GetRandomIntNumber(0, 9)];
+	newPerson->province = provinces[GetRandomIntNumber(0, 7)];
 
 	//ANA NAN
 	newPerson->postalCode[0] = GetRandomAlphabet();

@@ -51,26 +51,50 @@ bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 
 bool cSnotify::UpdateUser(cPerson* pPerson, std::string& errorString)
 {
-	int size = mListOfUsers.getSize();
-
-	Node<cPerson*>* currentNode;
 	cPerson* personToUpdate;
+	mListOfUsers.moveToFirst();
 
-	for (int i = 0; i < size; i++)
+	do
 	{
-		currentNode = mListOfUsers.mListOfNodes.getAt(i);
-		personToUpdate = currentNode->mData;
+		personToUpdate = mListOfUsers.getCurrent();
 
 		if (personToUpdate->getSnotifyUniqueUserID() == pPerson->getSnotifyUniqueUserID()
 			&& personToUpdate->SIN == pPerson->SIN)
 		{
-			delete currentNode->mData;
+			mListOfUsers.updateCurrent(pPerson);
 
-			currentNode->mData = pPerson;
-				return true;
+			delete personToUpdate;
+
+			return true;
 		}
-	}
 
+	} while (mListOfUsers.moveNext());
+
+	errorString = "Matching User not found";
+
+	return false;
+}
+
+bool cSnotify::DeleteUser(unsigned int SnotifyUserID, std::string& errorString)
+{
+	int size = mListOfUsers.getSize();
+
+	cPerson* personToUpdate;
+	mListOfUsers.moveToFirst();
+
+	do
+	{
+		personToUpdate = mListOfUsers.getCurrent();
+
+		if (personToUpdate->getSnotifyUniqueUserID() == SnotifyUserID)
+		{
+			mListOfUsers.deleteElement(personToUpdate);
+			return true;
+		}
+
+	} while (mListOfUsers.moveNext());
+
+	errorString = "Matching User not found";
 
 	return false;
 }
@@ -78,45 +102,23 @@ bool cSnotify::UpdateUser(cPerson* pPerson, std::string& errorString)
 
 bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 {
-	if (sizeOfUserArray == 0) { return false; }
+	sizeOfUserArray = mListOfUsers.getSize();
 
-	int size = mListOfUsers.getSize();
-
-	if(sizeOfUserArray < size) { return false; }
+	if (sizeOfUserArray == 0) return false;
 
 	pAllTheUsers = new cPerson[sizeOfUserArray];
 
-	std::cout << "Array Iteration " << std::endl;
-	TIMER_CALL(
-		Node<cPerson*>*currentNode;
+	mListOfUsers.moveToLast();
 
-	for (int i = 0; i < sizeOfUserArray; i++)
+	unsigned int index = 0;
+
+	do
 	{
-		currentNode = mListOfUsers.mListOfNodes.getAt(i);
-		pAllTheUsers[i] = *currentNode->mData;
+		pAllTheUsers[index] = *mListOfUsers.getCurrent();
 
-	}
-	);
+		index++;
 
-
-	//pAllTheUsers = new cPerson[sizeOfUserArray];
-
-	//std::cout << "List Iteration " << std::endl;
-
-	//TIMER_CALL(
-
-	//	mListOfUsers.moveToFirst();
-
-	//	int index = 0;
-
-	//	do
-	//	{
-	//		pAllTheUsers[index] = *mListOfUsers.getCurrent();
-
-	//		index++;
-
-	//	} while (mListOfUsers.moveNext() && index < sizeOfUserArray);
-	//);
+	} while (mListOfUsers.movePrevious());
 
 
 	return true;

@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < sizeOfUsers; i++)
 	{
 		cPerson* newPerson = personGenerator.generateRandomPerson();
-		std::cout << "Person Added : " << newPerson->first << std::endl;
+		std::cout << "Added : " << newPerson->first << std::endl;
 		snotify.AddUser(newPerson, errorMsg);
 
 		if (i == 5)
@@ -45,14 +45,28 @@ int main(int argc, char* argv[])
 	}
 
 	cPerson* listOfUsers;
+	unsigned int usersCount; 
 
 	snotify.UpdateUser(updatedUser,errorMsg);
 
-	snotify.GetUsers(listOfUsers, sizeOfUsers);
+	snotify.GetUsers(listOfUsers, usersCount);
 
-	for (int i = 0; i < sizeOfUsers; i++)
+	for (int i = 0; i < usersCount; i++)
 	{
-		std::cout << "Fetched Name : " << listOfUsers[i].first << std::endl;
+		std::cout << "Updated Name : " << listOfUsers[i].first << std::endl;
+
+		if (i == 5)
+		{
+			std::cout << "SIN : " << listOfUsers[i].SIN << std::endl;
+		}
+	}
+
+	snotify.DeleteUser(updatedUser->getSnotifyUniqueUserID(), errorMsg);
+
+	snotify.GetUsers(listOfUsers, usersCount);
+	for (int i = 0; i < usersCount; i++)
+	{
+		std::cout << "Deleted : " << listOfUsers[i].first << std::endl;
 
 		if (i == 5)
 		{

@@ -11,7 +11,7 @@ using namespace Containers;
 
 struct StreetData
 {
-	int streetNumber = 0;		
+	int streetNumber = 0;
 	std::string streetName;
 	std::string streetType;
 	std::string streetDirection;
@@ -58,7 +58,7 @@ public:
 	// Returns 0, NULL, or nullptr if it can't do this. 
 	cPerson* generateRandomPerson(void);
 
-private: 
+private:
 	bool ReadBabyNameFile(const std::string& fileName);
 	bool ReadSurnameFile(const std::string& fileName);
 	bool ReadStreetFile(const std::string& fileName);
@@ -67,18 +67,18 @@ private:
 	unsigned int GetSINNumber();
 	bool IsSINExists(unsigned int number);
 
-	
+
 	SmartArray<unsigned int> mGeneratedSINNumbers;
 	SmartArray<std::string> mListOfSurnames;
 	SmartArray<BabyNameData> mListOfBabyNames;
 	SmartArray<StreetData> mListOfStreetName;
 
-	std::string canadaCities[10] = {"Toronto","Montreal","Vancouver","Calgary","Edmonton",
-		"Ottawa","Quebec City","Hamilton","Halifax","London"};
+	std::string cities[10] = { "Toronto","Montreal","Vancouver","Calgary","Edmonton",
+		"Ottawa","Quebec City","Hamilton","Halifax","London" };
 
-	std::string canadaProvinces[13] = {"Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador",
-		"Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"
-	};
+	std::string provinces[8] = { "Alberta","British Columbia","Manitoba","Ontario","Quebec","Saskatchewan",
+		"Nunavut","Yukon" };
+
 
 };
 
