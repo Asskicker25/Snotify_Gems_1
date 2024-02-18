@@ -45,9 +45,9 @@ int main(int argc, char* argv[])
 	}
 
 	cPerson* listOfUsers;
-	unsigned int usersCount; 
+	unsigned int usersCount;
 
-	snotify.UpdateUser(updatedUser,errorMsg);
+	snotify.UpdateUser(updatedUser, errorMsg);
 
 	snotify.GetUsers(listOfUsers, usersCount);
 
@@ -73,19 +73,28 @@ int main(int argc, char* argv[])
 			std::cout << "SIN : " << listOfUsers[i].SIN << std::endl;
 		}
 	}
+
 	cSong* songToUpdate = musicGenerator.getRandomSong();
 	unsigned int uniqueId = songToUpdate->getUniqueID();
 
 	snotify.AddSong(songToUpdate, errorMsg);
-	
+
+	std::cout << "Added Song : " << snotify.FindSong(uniqueId)->name << std::endl;
+
 	songToUpdate = musicGenerator.getRandomSong();
 
 	songToUpdate->setUniqueID(uniqueId);
 
 	snotify.UpdateSong(songToUpdate, errorMsg);
 
+	std::cout << "Updated Song : " << snotify.FindSong(uniqueId)->name << std::endl;
+
 	snotify.DeleteSong(uniqueId, errorMsg);
 
+	if (snotify.FindSong(uniqueId))
+	{
+		std::cout << "Added Song : " << snotify.FindSong(uniqueId)->name << std::endl;
+	}
 
 	return -1;
 }

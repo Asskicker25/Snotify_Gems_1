@@ -27,6 +27,16 @@
 //	return true;
 //}
 
+cSong* cSnotify::FindSong(unsigned int uniqueID)
+{
+	cSong* songInList = nullptr;
+	std::string errorMsg;
+
+	GetSongWithId(uniqueID, songInList, errorMsg);
+
+	return songInList;
+}
+
 bool cSnotify::GetUsersSongLibrary(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
 {
 	return false;
@@ -81,10 +91,6 @@ bool cSnotify::DeleteUser(unsigned int SnotifyUserID, std::string& errorString)
 
 bool cSnotify::AddSong(cSong* pSong, std::string& errorString)
 {
-	//So that deleting songs from spotify won't delete them from music generator
-	/*cSong* newSong = new cSong();
-
-	*newSong = *pSong;*/
 
 	mListOfSongs.insertBeforeCurrent(pSong);
 	return true;
@@ -148,6 +154,8 @@ bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 
 bool cSnotify::GetUserWithId(unsigned int uniqueId, cPerson*& outPerson, std::string& errorString)
 {
+	if (mListOfUsers.getSize() == 0) return false;
+
 	cPerson* iteratedPerson;
 	mListOfUsers.moveToFirst();
 
@@ -171,6 +179,7 @@ bool cSnotify::GetUserWithId(unsigned int uniqueId, cPerson*& outPerson, std::st
 
 bool cSnotify::GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string& errorString)
 {
+	if (mListOfSongs.getSize() == 0) return false;
 
 	cSong* iteratedSong;
 	mListOfSongs.moveToFirst();
