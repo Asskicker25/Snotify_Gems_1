@@ -28,14 +28,14 @@ int main(int argc, char* argv[])
 
 	cPerson* updatedUser = new cPerson();
 
-	unsigned int sizeOfUsers = 10;
+	unsigned int sizeOfUsers = 5;
 	for (int i = 0; i < sizeOfUsers; i++)
 	{
 		cPerson* newPerson = personGenerator.generateRandomPerson();
 		std::cout << "Added : " << newPerson->first << std::endl;
 		snotify.AddUser(newPerson, errorMsg);
 
-		if (i == 5)
+		if (i == 0)
 		{
 			updatedUser = personGenerator.generateRandomPerson();
 			updatedUser->SIN = newPerson->SIN;
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "Updated Name : " << listOfUsers[i].first << std::endl;
 
-		if (i == 5)
+		if (i == 0)
 		{
 			std::cout << "SIN : " << listOfUsers[i].SIN << std::endl;
 		}
@@ -68,11 +68,24 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "Deleted : " << listOfUsers[i].first << std::endl;
 
-		if (i == 5)
+		if (i == 0)
 		{
 			std::cout << "SIN : " << listOfUsers[i].SIN << std::endl;
 		}
 	}
+	cSong* songToUpdate = musicGenerator.getRandomSong();
+	unsigned int uniqueId = songToUpdate->getUniqueID();
+
+	snotify.AddSong(songToUpdate, errorMsg);
+	
+	songToUpdate = musicGenerator.getRandomSong();
+
+	songToUpdate->setUniqueID(uniqueId);
+
+	snotify.UpdateSong(songToUpdate, errorMsg);
+
+	snotify.DeleteSong(uniqueId, errorMsg);
+
 
 	return -1;
 }

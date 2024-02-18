@@ -24,6 +24,7 @@ public:
 	// The cPerson has a common method for generating unique IDs, if you 
 	//	want to use that. 
 	unsigned int getUniqueID(void) { return this->uniqueID; }
+	void setUniqueID(unsigned int id) { this->uniqueID = id; }
 
 	unsigned int uniqueID;
 

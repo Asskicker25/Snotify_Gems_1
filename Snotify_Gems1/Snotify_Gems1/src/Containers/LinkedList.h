@@ -162,7 +162,7 @@ namespace Containers
 		}
 		else
 		{
-			mTailNode = node->mNextNode;
+			mTailNode = node->mPrevNode;
 		}
 
 		delete node;

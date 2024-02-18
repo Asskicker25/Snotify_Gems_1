@@ -51,54 +51,76 @@ bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 
 bool cSnotify::UpdateUser(cPerson* pPerson, std::string& errorString)
 {
-	cPerson* personToUpdate;
-	mListOfUsers.moveToFirst();
-
-	do
+	cPerson* personInList = nullptr;
+	if (GetUserWithId(pPerson->getSnotifyUniqueUserID(), personInList, errorString))
 	{
-		personToUpdate = mListOfUsers.getCurrent();
-
-		if (personToUpdate->getSnotifyUniqueUserID() == pPerson->getSnotifyUniqueUserID()
-			&& personToUpdate->SIN == pPerson->SIN)
+		if (personInList->SIN == pPerson->SIN)
 		{
 			mListOfUsers.updateCurrent(pPerson);
 
-			delete personToUpdate;
+			delete personInList;
 
 			return true;
 		}
-
-	} while (mListOfUsers.moveNext());
-
-	errorString = "Matching User not found";
+	}
 
 	return false;
 }
 
 bool cSnotify::DeleteUser(unsigned int SnotifyUserID, std::string& errorString)
 {
-	int size = mListOfUsers.getSize();
-
-	cPerson* personToUpdate;
-	mListOfUsers.moveToFirst();
-
-	do
+	cPerson* personInList = nullptr;
+	if (GetUserWithId(SnotifyUserID, personInList, errorString))
 	{
-		personToUpdate = mListOfUsers.getCurrent();
-
-		if (personToUpdate->getSnotifyUniqueUserID() == SnotifyUserID)
-		{
-			mListOfUsers.deleteElement(personToUpdate);
-			return true;
-		}
-
-	} while (mListOfUsers.moveNext());
-
-	errorString = "Matching User not found";
+		mListOfUsers.deleteAtCurrent();
+		return true;
+	}
 
 	return false;
 }
 
+bool cSnotify::AddSong(cSong* pSong, std::string& errorString)
+{
+	//So that deleting songs from spotify won't delete them from music generator
+	/*cSong* newSong = new cSong();
+
+	*newSong = *pSong;*/
+
+	mListOfSongs.insertBeforeCurrent(pSong);
+	return true;
+}
+
+bool cSnotify::UpdateSong(cSong* pSong, std::string& errorString)
+{
+	cSong* songInList = nullptr;
+	if (GetSongWithId(pSong->getUniqueID(), songInList, errorString))
+	{
+		mListOfSongs.updateCurrent(pSong);
+		return true;
+
+	}
+
+	return false;
+}
+
+bool cSnotify::DeleteSong(unsigned int UniqueSongID, std::string& errorString)
+{
+	cSong* songInList = nullptr;
+	if (GetSongWithId(UniqueSongID, songInList, errorString))
+	{
+		mListOfSongs.deleteAtCurrent();
+		return true;
+
+	}
+
+	return false;
+
+}
+
+bool cSnotify::AddSongToUserLibrary(unsigned int snotifyUserID, cSong* pNewSong, std::string& errorString)
+{
+	return false;
+}
 
 bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 {
@@ -122,4 +144,51 @@ bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 
 
 	return true;
+}
+
+bool cSnotify::GetUserWithId(unsigned int uniqueId, cPerson*& outPerson, std::string& errorString)
+{
+	cPerson* iteratedPerson;
+	mListOfUsers.moveToFirst();
+
+	do
+	{
+		iteratedPerson = mListOfUsers.getCurrent();
+
+		if (iteratedPerson->getSnotifyUniqueUserID() == uniqueId)
+		{
+			outPerson = iteratedPerson;
+
+			return true;
+		}
+
+	} while (mListOfUsers.moveNext());
+
+	errorString = "Matching User not found";
+
+	return false;
+}
+
+bool cSnotify::GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string& errorString)
+{
+
+	cSong* iteratedSong;
+	mListOfSongs.moveToFirst();
+
+	do
+	{
+		iteratedSong = mListOfSongs.getCurrent();
+
+		if (iteratedSong->getUniqueID() == uniqueId)
+		{
+			outSong = iteratedSong;
+
+			return true;
+		}
+
+	} while (mListOfSongs.moveNext());
+
+	errorString = "Matching Song not found";
+
+	return false;
 }
