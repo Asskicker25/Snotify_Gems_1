@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Profiler.h" />
     <ClInclude Include="src\Containers\LinkedList.h" />
     <ClInclude Include="src\Containers\SmartArray.h" />
     <ClInclude Include="src\cMusicGenerator.h" />
@@ -136,6 +137,8 @@
     <ClInclude Include="src\cSong.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Profiler.cpp" />
+    <ClCompile Include="src\cMusicGenerator.cpp" />
     <ClCompile Include="src\cPerson.cpp" />
     <ClCompile Include="src\cPersonGenerator.cpp" />
     <ClCompile Include="src\cSnotify.cpp" />
