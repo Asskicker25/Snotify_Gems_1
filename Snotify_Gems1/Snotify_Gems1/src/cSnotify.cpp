@@ -31,23 +31,10 @@ bool cSnotify::GetUsersSongLibrary(unsigned int snotifyUserID, cSong*& pLibraryA
 	return false;
 }
 
+
+
 cSnotify::cSnotify()
 {
-	std::string errorMsg;
-
-	personGenerator.LoadCensusFiles(
-		"Assets/BabyName/yob2019.txt",
-		"Assets/Surname/Names_2010Census.csv",
-		"Assets/StreetName/Street_Names.csv", errorMsg);
-
-
-	Profiler profiler;
-
-	profiler.StartTimer();
-	musicGenerator.LoadMusicInformation("Assets/Billboard/hot_stuff_2 - Copy.csv", errorMsg);
-	profiler.EndTimer();
-
-	std::cout << profiler.GetElapsedTime() << std::endl;
 }
 
 cSnotify::~cSnotify()
@@ -56,5 +43,29 @@ cSnotify::~cSnotify()
 
 bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 {
-	return false;
+	mListOfUsers.insertBeforeCurrent(pPerson);
+
+	return true;
+}
+
+
+bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
+{
+	if (sizeOfUserArray == 0) { return false; }
+
+	pAllTheUsers = new cPerson[sizeOfUserArray];
+
+	mListOfUsers.moveToFirst();
+
+	int index = 0;
+
+	do
+	{
+		pAllTheUsers[index] = *mListOfUsers.getCurrent();
+
+		index++;
+
+	} while (mListOfUsers.moveNext() && index < sizeOfUserArray);
+
+	return true;
 }

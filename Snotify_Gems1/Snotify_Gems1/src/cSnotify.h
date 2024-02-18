@@ -4,14 +4,9 @@
 #include "cPerson.h"
 #include "cSong.h"
 
-#include "Containers/SmartArray.h"
 #include "Containers/LinkedList.h"
-#include "cPersonGenerator.h"
-#include "cMusicGenerator.h"
-#include "Profiler.h"
 
 using namespace Containers;
-
 
 class cSnotify
 {
@@ -89,9 +84,8 @@ public:
 
 
 private:
+	LinkedList<cPerson*> mListOfUsers;
 
-	cPersonGenerator personGenerator;
-	cMusicGenerator musicGenerator;
 };
 
 #endif // !_cSnotify_HG_
