@@ -6,7 +6,6 @@
 #include <string>
 #include <random>
 
-
 cMusicGenerator::cMusicGenerator()
 {
 }
@@ -25,6 +24,8 @@ bool cMusicGenerator::LoadMusicInformation(std::string musicFileName, std::strin
 	}
 
 	std::string theLine;
+
+	
 
 	unsigned int lineCount = 0;
 	while (std::getline(file, theLine))
@@ -54,15 +55,21 @@ bool cMusicGenerator::LoadMusicInformation(std::string musicFileName, std::strin
 				artist = value;
 			}
 
-			if (index > 4) continue;
+			if (index > 4) break;
 			
 			index++;
 		}
+		AddSong(songName, artist);
 
-		if (!IsDuplicate(songName, artist))
-		{
-			AddSong(songName, artist);
-		}
+		//unsigned int hashValue = Hashing((songName + artist).c_str());
+
+		//// Check if the song already exists in the hash table
+		//if (!songTable[hashValue])
+		//{
+		//	// If not, add the song to the list
+		//	
+		//	songTable[hashValue] = true; // Mark the slot as occupied
+		//}
 
 	}
 	std::cout << "Line : " << lineCount << std::endl;
@@ -71,18 +78,19 @@ bool cMusicGenerator::LoadMusicInformation(std::string musicFileName, std::strin
 
 cSong* cMusicGenerator::getRandomSong(void)
 {
-	return mListOfSongs.getAt(GetRandomIntNumber(0,mListOfSongs.getSize()));
+	//return mListOfSongs.getAt(GetRandomIntNumber(0,mListOfSongs.getSize()));
+	return nullptr;
 }
 
 cSong* cMusicGenerator::findSong(std::string songName, std::string artist)
 {
-	for (int i = 0; i < mListOfSongs.getSize(); i++)
+	/*for (int i = 0; i < mListOfSongs.getSize(); i++)
 	{
 		if (mListOfSongs.getAt(i)->name == songName && mListOfSongs.getAt(i)->artist == artist)
 		{
 			return mListOfSongs.getAt(i);
 		}
-	}
+	}*/
 
 	return nullptr;
 }
@@ -98,15 +106,27 @@ int cMusicGenerator::GetRandomIntNumber(int minValue, int maxValue)
 
 bool cMusicGenerator::IsDuplicate(const std::string& songName, const std::string& artist)
 {
-	for (int i = 0; i < mListOfSongs.getSize(); i++)
+	/*for (int i = 0; i < mListOfSongs.getSize(); i++)
 	{
 		if (mListOfSongs.getAt(i)->name == songName && mListOfSongs.getAt(i)->artist == artist)
 		{
 			return true;
 		}
-	}
+	}*/
 
 	return false;
+}
+
+unsigned int cMusicGenerator::Hashing(const char* str)
+{
+	unsigned int hash = 5381;
+	int c;
+
+	while ((c = *str++)) {
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	}
+
+	return hash;
 }
 
 void cMusicGenerator::AddSong(const std::string& songName, const std::string& artist)
@@ -116,5 +136,5 @@ void cMusicGenerator::AddSong(const std::string& songName, const std::string& ar
 	newSong->name = songName;
 	newSong->artist = artist;
 
-	mListOfSongs.addAtEnd(newSong);
+	mListOfSongs.put((songName + artist), newSong);
 }

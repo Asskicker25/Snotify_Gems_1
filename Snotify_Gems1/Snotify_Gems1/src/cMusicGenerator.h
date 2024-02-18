@@ -5,8 +5,25 @@
 #include "cSong.h"
 
 #include "Containers/SmartArray.h"
+#include "HashMap.h"
 
 using namespace Containers;
+
+struct MyKeyHash {
+	unsigned long operator()(const std::string& k) const
+	{
+		unsigned int hash = 5381;
+		int c;
+		const char* str = k.c_str();
+
+		while ((c = *str++)) {
+			hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+		}
+
+		return hash;
+	}
+};
+
 
 class cMusicGenerator
 {
@@ -28,9 +45,10 @@ private:
 	void AddSong(const std::string& songName, const std::string& artist);
 	int GetRandomIntNumber(int minValue, int maxValue);
 	bool IsDuplicate(const std::string& songName,const  std::string& artist);
+	unsigned int Hashing(const char* str);
 	
-	SmartArray<cSong*> mListOfSongs;
-
+	//SmartArray<cSong*> mListOfSongs;
+	HashMap<std::string, cSong*, MyKeyHash> mListOfSongs;
 };
 
 #endif

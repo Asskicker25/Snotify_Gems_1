@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 	Profiler profiler;
 
 	profiler.StartTimer();
-	musicGenerator.LoadMusicInformation("Assets/Billboard/hot_stuff_2.csv", errorMsg);
+	musicGenerator.LoadMusicInformation("Assets/Billboard/hot_stuff_2 - Copy.csv", errorMsg);
 	profiler.EndTimer();
 
 	std::cout << profiler.GetElapsedTime() << std::endl;
