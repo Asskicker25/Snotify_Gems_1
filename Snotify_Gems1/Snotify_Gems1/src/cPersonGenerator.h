@@ -2,12 +2,26 @@
 #define _cPersonGenerator_HG_
 
 #include <string>
-#include <functional>
+#include <random>
 
 #include "cPerson.h"
 #include "Containers/SmartArray.h"
 
 using namespace Containers;
+
+struct StreetData
+{
+	int streetNumber = 0;		
+	std::string streetName;
+	std::string streetType;
+	std::string streetDirection;
+};
+
+struct BabyNameData
+{
+	std::string name;
+	std::string gender;
+};
 
 class cPersonGenerator
 {
@@ -45,12 +59,26 @@ public:
 	cPerson* generateRandomPerson(void);
 
 private: 
-	bool ReadCSVFile(const std::string& fileName, bool headerAvailable, std::function<void(std::string)> OnLineRead);
+	bool ReadBabyNameFile(const std::string& fileName);
+	bool ReadSurnameFile(const std::string& fileName);
+	bool ReadStreetFile(const std::string& fileName);
+	int GetRandomIntNumber(int minValue, int maxValue);
+	char GetRandomAlphabet();
+	unsigned int GetSINNumber();
+	bool IsSINExists(unsigned int number);
 
-	SmartArray<std::string> mListOfBabyNames;
+	
+	SmartArray<unsigned int> mGeneratedSINNumbers;
 	SmartArray<std::string> mListOfSurnames;
-	SmartArray<std::string> mListOfStreetName;
+	SmartArray<BabyNameData> mListOfBabyNames;
+	SmartArray<StreetData> mListOfStreetName;
 
+	std::string canadaCities[10] = {"Toronto","Montreal","Vancouver","Calgary","Edmonton",
+		"Ottawa","Quebec City","Hamilton","Halifax","London"};
+
+	std::string canadaProvinces[13] = {"Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador",
+		"Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"
+	};
 
 };
 

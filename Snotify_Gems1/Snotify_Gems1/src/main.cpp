@@ -16,5 +16,10 @@ int main(int argc, char* argv[])
 		"Assets/Surname/Names_2010Census.csv",
 		"Assets/StreetName/Street_Names.csv", errorMsg);
 
+	for (int i = 0; i < 10; i++)
+	{
+		cPerson* newPerson = personGenerator.generateRandomPerson();
+	}
+
 	return -1;
 }

@@ -3,6 +3,7 @@
 // Warning C26812 : Prefer 'enum class' over 'enum' (Enum.3)
 #pragma warning( disable : 26812 )
 
+
 cPerson::cPerson()
 {
 	// In here, set the default information
@@ -20,7 +21,7 @@ cPerson::cPerson()
 
 // The 1st Snotify user will have ID: 10,000,000
 // static 
-unsigned int cPerson::m_NEXT_Snotify_UniqueUSerID = 10000000;
+unsigned int cPerson::m_NEXT_Snotify_UniqueUSerID = 100;
 
 cPerson::~cPerson()
 {
@@ -50,4 +51,9 @@ std::string cPerson::getGenderAsString(void)
 	// This should never happen
 //	return "RATHER_NOT_SAY_UNKNOWN";
 	return "OMG! CALL THE DEV TEAM!! SOMEONE SCREWED UP!!!";
+}
+
+unsigned int cPerson::getSnotifyUniqueUserID(void)
+{
+	return m_Snotify_UniqueUserID;
 }
