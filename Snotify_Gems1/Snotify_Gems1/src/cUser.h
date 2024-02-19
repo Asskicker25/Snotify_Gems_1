@@ -12,10 +12,10 @@ public:
 	cUser() = default;
 	cUser(cPerson* person) : mPerson{ person } {}
 
-	bool AddSong(cSong* song);
+	bool AddSong(unsigned int songId);
 	bool RemoveSong(unsigned int songUniqueId);
-	bool FindSong(unsigned int songUniqueId, cUserSong*& song, unsigned int& index);
-	bool GetPlaylist(cSong*& songArray, unsigned int& sizeOfArray);
+	bool FindSong(unsigned int songUniqueId, unsigned int& index);
+	bool GetPlaylist(cUserSong*& songIdArray, unsigned int& sizeOfArray);
 
 	cPerson* mPerson;
 

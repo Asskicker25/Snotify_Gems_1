@@ -1,13 +1,12 @@
 #include "cUser.h"
 
-bool cUser::AddSong(cSong* song)
+bool cUser::AddSong(unsigned int songId)
 {
-	cUserSong* songInList;
 	unsigned int index;
 
-	if (!FindSong(song->getUniqueID(), songInList, index))
+	if (!FindSong(songId, index))
 	{
-		mPlaylist.addAtEnd(new cUserSong(song));
+		mPlaylist.addAtEnd(new cUserSong(songId));
 		return true;
 	}
 
@@ -16,10 +15,9 @@ bool cUser::AddSong(cSong* song)
 
 bool cUser::RemoveSong(unsigned int songUniqueId)
 {
-	cUserSong* songInList;
 	unsigned int index;
 
-	if (FindSong(songUniqueId, songInList, index))
+	if (FindSong(songUniqueId, index))
 	{
 		mPlaylist.removeAt(index);
 		return true;
@@ -28,40 +26,37 @@ bool cUser::RemoveSong(unsigned int songUniqueId)
 	return false;
 }
 
-bool cUser::FindSong(unsigned int songUniqueId, cUserSong*& song, unsigned int& index)
+bool cUser::FindSong(unsigned int songUniqueId, unsigned int& index)
 {
 	for (int i = 0; i < mPlaylist.getSize(); i++)
 	{
-		song = mPlaylist.getAt(i);
 
-		if (song->mSong->getUniqueID() == songUniqueId)
+		if (mPlaylist.getAt(i)->mSongUniqueId == songUniqueId)
 		{
 			index = i;
 			return true;
 		}
 	}
 
-	song = nullptr;
-
 	return false;
 }
 
-bool cUser::GetPlaylist(cSong*& songArray, unsigned int& sizeOfArray)
+bool cUser::GetPlaylist(cUserSong*& songIdArray, unsigned int& sizeOfArray)
 {
 	sizeOfArray = mPlaylist.getSize();
 
 	if (sizeOfArray == 0) return false;
 	
-	songArray = new cSong[sizeOfArray];
+	songIdArray = new cUserSong[sizeOfArray];
 
 	cUserSong* iteratedSong = nullptr;
 
 	for (int i = 0; i < sizeOfArray; i++)
 	{
 		iteratedSong = mPlaylist.getAt(i);
-		songArray[i] = *iteratedSong->mSong;
-		songArray[i].rating = iteratedSong->rating;
-		songArray[i].numberOfTimesPlayed = iteratedSong->numberOfTimesPlayed;
+		songIdArray[i] = *iteratedSong;
+		/*songIdArray[i].rating = iteratedSong->rating;
+		songIdArray[i].numberOfTimesPlayed = iteratedSong->numberOfTimesPlayed;*/
 
 	}
 

@@ -7,9 +7,10 @@ class cUserSong
 
 public:
 	cUserSong() = default;
-	cUserSong(cSong* song) : mSong{ song } {}
+	cUserSong(unsigned int id) : mSongUniqueId{ id } {}
 
-	cSong* mSong;
+	unsigned int mSongUniqueId;
+	//cSong* mSong;
 	int rating = 0;
 	int numberOfTimesPlayed = 0;
 };

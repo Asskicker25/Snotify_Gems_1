@@ -158,7 +158,7 @@ bool cSnotify::AddSongToUserLibrary(unsigned int snotifyUserID, cSong* pNewSong,
 	cUser* userInList = nullptr;
 	if (GetUserWithId(snotifyUserID, userInList, errorString))
 	{
-		if (userInList->AddSong(pNewSong))
+		if (userInList->AddSong(pNewSong->getUniqueID()))
 		{
 			return true;
 		}
@@ -207,7 +207,17 @@ cSong* cSnotify::GetSong(unsigned int SnotifyUserID, unsigned int songUniqueID, 
 	if (GetUserSongWithId(SnotifyUserID, songUniqueID, userSong))
 	{
 		userSong->numberOfTimesPlayed++;
-		return userSong->mSong;
+		cSong* song;
+
+		if (GetSongWithId(songUniqueID, song, errorString))
+		{
+
+		}
+		else
+		{
+
+		}
+		return GetSongWithId(songUniqueID,);
 	}
 
 	errorString = "Song not found in playlist.";
@@ -370,7 +380,7 @@ bool cSnotify::FindUsersFirstName(std::string firstName, cPerson*& pAllTheUsers,
 	{
 		iteratedPerson = mListOfUsers.getCurrent()->mPerson;
 
-		if (cMusicGenerator::Hashing( (iteratedPerson->first).c_str()) == cMusicGenerator::Hashing( (firstName).c_str()))
+		if (cMusicGenerator::Hashing((iteratedPerson->first).c_str()) == cMusicGenerator::Hashing((firstName).c_str()))
 		{
 			pAllTheUsers[sizeOfFirstNames] = *mListOfUsers.getCurrent()->mPerson;
 			sizeOfFirstNames++;
@@ -447,7 +457,7 @@ bool cSnotify::FindUsersFirstLastNames(std::string firstName, std::string lastNa
 	{
 		iteratedPerson = mListOfUsers.getCurrent()->mPerson;
 
-		if (cMusicGenerator::Hashing((iteratedPerson->first + iteratedPerson->last).c_str()) == 
+		if (cMusicGenerator::Hashing((iteratedPerson->first + iteratedPerson->last).c_str()) ==
 			cMusicGenerator::Hashing((firstName + lastName).c_str()))
 		{
 			pAllTheUsers[sizeOfFirstNames] = *mListOfUsers.getCurrent()->mPerson;
@@ -500,7 +510,7 @@ bool cSnotify::GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string
 {
 	outSong = nullptr;
 
-	if (mListOfSongs.getSize() == 0)  
+	if (mListOfSongs.getSize() == 0)
 	{
 		errorString = "No Songs Added.";
 		return false;
@@ -535,8 +545,13 @@ bool cSnotify::GetUserSongWithId(unsigned int userID, unsigned int songID, cUser
 	if (GetUserWithId(userID, userInList, errorString))
 	{
 		unsigned int index;
-		if (userInList->FindSong(songID, userSong, index))
+		if (userInList->FindSong(songID, index))
 		{
+			/*if (GetSong(userID, songID, errorString))
+			{
+				return true;
+			}
+			std::cout << "Song not found in Snotify list." << std::endl;*/
 			return true;
 		}
 
