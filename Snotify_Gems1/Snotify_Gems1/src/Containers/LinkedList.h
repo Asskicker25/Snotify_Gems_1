@@ -36,6 +36,8 @@ namespace Containers
 		void clear();
 
 		inline unsigned int getSize() { return mSize; }
+		inline Node<T>* getCurrentNode() { return mCurrentNode; }
+		inline void setCurrentNode(Node<T>* node) { mCurrentNode = node; }
 		
 		T getCurrent();
 

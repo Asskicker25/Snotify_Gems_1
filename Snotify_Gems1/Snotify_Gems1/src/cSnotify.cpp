@@ -31,8 +31,9 @@ cSong* cSnotify::FindSong(unsigned int uniqueID)
 {
 	cSong* songInList = nullptr;
 	std::string errorMsg;
+	unsigned int nodeIndex = 0;
 
-	GetSongWithId(uniqueID, songInList, errorMsg);
+	GetSongWithId(uniqueID, songInList, nodeIndex, errorMsg);
 
 	return songInList;
 }
@@ -55,6 +56,7 @@ cSnotify::~cSnotify()
 bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 {
 	mListOfUsers.insertBeforeCurrent(pPerson);
+	mListOfUserNodes.addAtEnd(mListOfUsers.getCurrentNode());
 
 	return true;
 }
@@ -62,7 +64,9 @@ bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 bool cSnotify::UpdateUser(cPerson* pPerson, std::string& errorString)
 {
 	cPerson* personInList = nullptr;
-	if (GetUserWithId(pPerson->getSnotifyUniqueUserID(), personInList, errorString))
+	unsigned int nodeIndex = 0;
+
+	if (GetUserWithId(pPerson->getSnotifyUniqueUserID(), personInList, nodeIndex, errorString))
 	{
 		if (personInList->SIN == pPerson->SIN)
 		{
@@ -80,8 +84,11 @@ bool cSnotify::UpdateUser(cPerson* pPerson, std::string& errorString)
 bool cSnotify::DeleteUser(unsigned int SnotifyUserID, std::string& errorString)
 {
 	cPerson* personInList = nullptr;
-	if (GetUserWithId(SnotifyUserID, personInList, errorString))
+	unsigned int nodeIndex = 0;
+
+	if (GetUserWithId(SnotifyUserID, personInList, nodeIndex, errorString))
 	{
+		mListOfUserNodes.removeAt(nodeIndex);
 		mListOfUsers.deleteAtCurrent();
 		return true;
 	}
@@ -93,13 +100,17 @@ bool cSnotify::AddSong(cSong* pSong, std::string& errorString)
 {
 
 	mListOfSongs.insertBeforeCurrent(pSong);
+	mListOfSongNodes.addAtEnd(mListOfSongs.getCurrentNode());
+
 	return true;
 }
 
 bool cSnotify::UpdateSong(cSong* pSong, std::string& errorString)
 {
 	cSong* songInList = nullptr;
-	if (GetSongWithId(pSong->getUniqueID(), songInList, errorString))
+	unsigned int nodeIndex = 0;
+
+	if (GetSongWithId(pSong->getUniqueID(), songInList, nodeIndex, errorString))
 	{
 		mListOfSongs.updateCurrent(pSong);
 		return true;
@@ -112,8 +123,11 @@ bool cSnotify::UpdateSong(cSong* pSong, std::string& errorString)
 bool cSnotify::DeleteSong(unsigned int UniqueSongID, std::string& errorString)
 {
 	cSong* songInList = nullptr;
-	if (GetSongWithId(UniqueSongID, songInList, errorString))
+	unsigned int nodeIndex = 0;
+
+	if (GetSongWithId(UniqueSongID, songInList, nodeIndex, errorString))
 	{
+		mListOfSongNodes.removeAt(nodeIndex);
 		mListOfSongs.deleteAtCurrent();
 		return true;
 
@@ -130,7 +144,21 @@ bool cSnotify::AddSongToUserLibrary(unsigned int snotifyUserID, cSong* pNewSong,
 
 bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 {
+
 	sizeOfUserArray = mListOfUsers.getSize();
+
+	if (sizeOfUserArray == 0) return false;
+
+	pAllTheUsers = new cPerson[sizeOfUserArray];
+
+	for (int i = 0; i < sizeOfUserArray; i++)
+	{
+		pAllTheUsers[i] = *mListOfUserNodes.getAt(i)->mData;
+	}
+
+	return true;
+
+	/*sizeOfUserArray = mListOfUsers.getSize();
 
 	if (sizeOfUserArray == 0) return false;
 
@@ -149,53 +177,85 @@ bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 	} while (mListOfUsers.movePrevious());
 
 
-	return true;
+	return true;*/
 }
 
-bool cSnotify::GetUserWithId(unsigned int uniqueId, cPerson*& outPerson, std::string& errorString)
+bool cSnotify::GetUserWithId(unsigned int uniqueId, cPerson*& outPerson, unsigned int& nodeIndex, std::string& errorString )
 {
-	if (mListOfUsers.getSize() == 0) return false;
+	unsigned int size = mListOfUsers.getSize();
 
-	cPerson* iteratedPerson;
-	mListOfUsers.moveToFirst();
+	if (size == 0) return false;
 
-	do
+	for (int i = 0; i < size; i++)
 	{
-		iteratedPerson = mListOfUsers.getCurrent();
+		outPerson = mListOfUserNodes.getAt(i)->mData;
 
-		if (iteratedPerson->getSnotifyUniqueUserID() == uniqueId)
+		if (outPerson->getSnotifyUniqueUserID() == uniqueId)
 		{
-			outPerson = iteratedPerson;
-
+			mListOfUsers.setCurrentNode(mListOfUserNodes.getAt(i));
+			nodeIndex = i;
 			return true;
 		}
+	}
 
-	} while (mListOfUsers.moveNext());
+	outPerson = nullptr;
+
+	//cPerson* iteratedPerson;
+	//mListOfUsers.moveToFirst();
+
+	//do
+	//{
+	//	iteratedPerson = mListOfUsers.getCurrent();
+
+	//	if (iteratedPerson->getSnotifyUniqueUserID() == uniqueId)
+	//	{
+	//		outPerson = iteratedPerson;
+
+	//		return true;
+	//	}
+
+	//} while (mListOfUsers.moveNext());
 
 	errorString = "Matching User not found";
 
 	return false;
 }
 
-bool cSnotify::GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string& errorString)
+bool cSnotify::GetSongWithId(unsigned int uniqueId, cSong*& outSong, unsigned int& nodeIndex, std::string& errorString)
 {
-	if (mListOfSongs.getSize() == 0) return false;
+	unsigned int size = mListOfSongs.getSize();
 
-	cSong* iteratedSong;
-	mListOfSongs.moveToFirst();
+	if (size == 0) return false;
 
-	do
+	for (int i = 0; i < size; i++)
 	{
-		iteratedSong = mListOfSongs.getCurrent();
+		outSong = mListOfSongNodes.getAt(i)->mData;
 
-		if (iteratedSong->getUniqueID() == uniqueId)
+		if (outSong->getUniqueID() == uniqueId)
 		{
-			outSong = iteratedSong;
-
+			mListOfSongs.setCurrentNode(mListOfSongNodes.getAt(i));
+			nodeIndex = i;
 			return true;
 		}
+	}
 
-	} while (mListOfSongs.moveNext());
+	outSong = nullptr;
+
+	//cSong* iteratedSong;
+	//mListOfSongs.moveToFirst();
+
+	//do
+	//{
+	//	iteratedSong = mListOfSongs.getCurrent();
+
+	//	if (iteratedSong->getUniqueID() == uniqueId)
+	//	{
+	//		outSong = iteratedSong;
+
+	//		return true;
+	//	}
+
+	//} while (mListOfSongs.moveNext());
 
 	errorString = "Matching Song not found";
 
