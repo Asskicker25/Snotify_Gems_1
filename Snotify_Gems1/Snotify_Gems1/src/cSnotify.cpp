@@ -100,6 +100,8 @@ bool cSnotify::UpdateUser(cPerson* pPerson, std::string& errorString)
 
 			return true;
 		}
+
+		errorString = "User SIN doesn't match.";
 	}
 
 	return false;
@@ -353,7 +355,7 @@ bool cSnotify::FindUsersFirstName(std::string firstName, cPerson*& pAllTheUsers,
 
 	if (sizeOfUserArray == 0) return false;
 
-	if (pAllTheUsers != nullptr) { delete[] pAllTheUsers; }
+	//if (pAllTheUsers != nullptr) { delete[] pAllTheUsers; }
 
 	pAllTheUsers = new cPerson[sizeOfUserArray];
 
@@ -467,7 +469,11 @@ bool cSnotify::FindUsersFirstLastNames(std::string firstName, std::string lastNa
 
 bool cSnotify::GetUserWithId(unsigned int uniqueId, cUser*& outUser, std::string& errorString)
 {
-	if (mListOfUsers.getSize() == 0) return false;
+	if (mListOfUsers.getSize() == 0)
+	{
+		errorString = "No Users added.";
+		return false;
+	}
 
 	cUser* iteratedUser;
 	mListOfUsers.moveToFirst();
