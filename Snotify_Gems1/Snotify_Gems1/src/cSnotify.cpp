@@ -498,8 +498,13 @@ bool cSnotify::GetUserWithId(unsigned int uniqueId, cUser*& outUser, std::string
 
 bool cSnotify::GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string& errorString)
 {
-	if (mListOfSongs.getSize() == 0) return false;
+	outSong = nullptr;
 
+	if (mListOfSongs.getSize() == 0)  
+	{
+		errorString = "No Songs Added.";
+		return false;
+	}
 	cSong* iteratedSong;
 	mListOfSongs.moveToFirst();
 
@@ -517,6 +522,7 @@ bool cSnotify::GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string
 	} while (mListOfSongs.moveNext());
 
 	errorString = "Matching Song not found";
+
 
 	return false;
 }

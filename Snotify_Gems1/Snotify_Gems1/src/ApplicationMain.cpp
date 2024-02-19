@@ -1,4 +1,7 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
+
 #include "cSnotify.h"
 
 
@@ -12,13 +15,16 @@ void PrintUserHandling();
 void PrintSongHandling();
 void PrintUserPlaylistHandling();
 void PrintPersonInfo(cPerson& person);
+void PrintSongInfo(cSong& song);
 void PrintErrorMessage(std::string& errorMsg);
 
 unsigned int input;
 unsigned int sizeOfArray;
 std::string errorMsg;
 std::string inputString;
+std::string inputString2;
 cPerson* person;
+cSong* song;
 
 cSnotify snotify;
 cPersonGenerator personGenerator;
@@ -297,6 +303,123 @@ void PrintUserHandling()
 
 void PrintSongHandling()
 {
+	do
+	{
+
+		printf("**** User Handling ****\n\n");
+
+		printf("1. Add Random Song\n");
+		printf("2. Update Song\n");
+		printf("3. Delete Song\n");
+		printf("4. Find Song By Title And Artist\n");
+		printf("5. Find Song By Song ID\n");
+	
+
+		printf("\nEnter Selection : ");
+
+		std::cin >> input;
+
+		printf("\n");
+
+		switch (input)
+		{
+		case 1:
+			printf("Number of Songs To Add : ");
+			std::cin >> input;
+			printf("\n");
+
+			for (int i = 0; i < input; i++)
+			{
+				song = musicGenerator.getRandomSong();
+				snotify.AddSong(song,errorMsg);
+				PrintSongInfo(*song);
+				printf("\n");
+			}
+
+			break;
+		case 2:
+
+			song = musicGenerator.getRandomSong();
+
+			printf("Song Unique ID To Update  : ");
+			std::cin >> input;
+			printf("\n");
+
+			song->setUniqueID(input);
+			
+			if (!snotify.UpdateSong(song, errorMsg))
+			{
+				PrintErrorMessage(errorMsg);
+			}
+			else
+			{
+				printf("Song Updated Successfully !!!\n");
+
+				PrintSongInfo(*song);
+			}
+
+
+			break;
+		case 3:
+
+			printf("Song Unique ID To Delete  : ");
+			std::cin >> input;
+			printf("\n");
+
+			if (snotify.DeleteSong(input, errorMsg))
+			{
+				printf("Song Deleted Successfully !!!\n");
+			}
+			else
+			{
+				PrintErrorMessage(errorMsg);
+			}
+
+			break;
+		case 4:
+
+			inputString = "";
+			
+			printf("Enter Song Title : ");
+			std::cin.ignore(); 
+			std::getline(std::cin, inputString);
+
+			printf("Enter Song Artist : ");
+			std::getline(std::cin, inputString2);
+
+			song = snotify.FindSong(inputString, inputString2);
+
+			if (song == nullptr)
+			{
+				printf("\nSong with Title And Artist Not Found.\n");
+			}
+			else
+			{
+				PrintSongInfo(*song);
+			}
+
+			break;
+
+		case 5:
+
+
+			printf("Find Song By Unique ID : ");
+			std::cin >> input;
+
+			song = snotify.FindSong(input);
+			if (song != nullptr)
+			{
+				PrintSongInfo(*song);
+			}
+			else
+			{
+				PrintErrorMessage(errorMsg);
+			}
+			break;
+		}
+
+	} while (input < 1 && input > 5);
+
 }
 
 void PrintUserPlaylistHandling()
@@ -313,6 +436,17 @@ void PrintPersonInfo(cPerson& person)
 	printf("Snotify ID : %d\n", snotifyId);
 	printf("SIN : %d\n", SIN);
 
+}
+
+void PrintSongInfo(cSong& song)
+{
+	std::string title = song.name.c_str();
+	std::string artist = song.artist.c_str();
+	unsigned int unqiueId = song.getUniqueID();
+
+	printf("Title : %s\n", title.c_str());
+	printf("Artist : %s\n", artist.c_str());
+	printf("Unique ID : %u\n", unqiueId);
 }
 
 void PrintErrorMessage(std::string& errorMsg)
