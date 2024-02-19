@@ -45,3 +45,25 @@ bool cUser::FindSong(unsigned int songUniqueId, cUserSong*& song, unsigned int& 
 
 	return false;
 }
+
+bool cUser::GetPlaylist(cSong*& songArray, unsigned int& sizeOfArray)
+{
+	sizeOfArray = mPlaylist.getSize();
+
+	if (sizeOfArray == 0) return false;
+	
+	songArray = new cSong[sizeOfArray];
+
+	cUserSong* iteratedSong = nullptr;
+
+	for (int i = 0; i < sizeOfArray; i++)
+	{
+		iteratedSong = mPlaylist.getAt(i);
+		songArray[i] = *iteratedSong->mSong;
+		songArray[i].rating = iteratedSong->rating;
+		songArray[i].numberOfTimesPlayed = iteratedSong->numberOfTimesPlayed;
+
+	}
+
+	return true;
+}

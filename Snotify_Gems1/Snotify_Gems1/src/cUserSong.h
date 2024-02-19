@@ -10,7 +10,7 @@ public:
 	cUserSong(cSong* song) : mSong{ song } {}
 
 	cSong* mSong;
-	int rating;
-	int numberOfTimesPlayed;
+	int rating = 0;
+	int numberOfTimesPlayed = 0;
 };
 

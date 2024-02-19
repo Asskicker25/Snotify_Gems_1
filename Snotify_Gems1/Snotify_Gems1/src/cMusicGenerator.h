@@ -23,6 +23,8 @@ public:
 	// So case sensitive, etc. 
 	cSong* findSong(std::string songName, std::string artist);
 
+	static unsigned int Hashing(const char* str);
+
 private:
 	bool LoadFromCSV(std::string musicFileName, std::string& errorString);
 
@@ -32,7 +34,6 @@ private:
 
 	int GetRandomIntNumber(int minValue, int maxValue);
 	int QuickSortPartition(SmartArray<cSong*>& songs, int low, int high);
-	unsigned int Hashing(const char* str);
 	
 	void QuickSort(SmartArray<cSong*>& songs, int low, int high);
 

@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Containers\SortUtils.h" />
     <ClInclude Include="src\cUserSong.h" />
     <ClInclude Include="src\cUser.h" />
     <ClInclude Include="src\Profiler.h" />

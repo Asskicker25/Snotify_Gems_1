@@ -1,31 +1,41 @@
 #include <iostream>
 #include "Profiler.h"
 #include "cSnotify.h"
+#include "cMusicGenerator.h"
+#include "Containers/SortUtils.h"
 
-//// This returns a COPY of the users library, in the form of a regular dynamic array.
-//bool cSnotify::GetUsersSongLibrary(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary);
-//{
-//	// The caller would do something like this (assume the user ID = 28472382)
-//	//
-//	//	cSong* pTheSongs = 0;
-//	//	unsigned int arraySize = 0;
-//	//	GetUsersSongLibrary( 28472382, pTheSongs, arraySize );
-//	// 
-//	// Inside this method, you'd do something like this:
-//
-//	// TODO: Find that user... 
-//
-//	// Alloate a heap based array to hold all the songs...
-//
-////	sizeOfLibary = WhateverYouHaveToDoToGetThisValue();
-////	pCopyOfLibrary = new cSong[sizeOfLibary];
-//
-//	// The array and the size of the array are "returned" by reference to the caller. 
-//
-//	// TODO: Copy all the songs over
-//
-//	return true;
-//}
+bool AscendingSongName(cSong a, cSong b)
+{
+	char lhs = a.name.c_str()[0];
+	char rhs = b.name.c_str()[0];
+
+	return lhs < rhs;
+}
+
+bool AscendingArtistName(cSong a, cSong b)
+{
+	char lhs = a.artist.c_str()[0];
+	char rhs = b.artist.c_str()[0];
+
+	return lhs < rhs;
+}
+
+
+
+cSnotify::cSnotify()
+{
+}
+
+cSnotify::~cSnotify()
+{
+}
+
+cSong* cSnotify::FindSong(std::string title, std::string artist)
+{
+	unsigned int hashId = cMusicGenerator::Hashing((title + artist).c_str());
+
+	return FindSong(hashId);
+}
 
 cSong* cSnotify::FindSong(unsigned int uniqueID)
 {
@@ -39,18 +49,38 @@ cSong* cSnotify::FindSong(unsigned int uniqueID)
 
 bool cSnotify::GetUsersSongLibrary(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
 {
+	cUser* user = nullptr;
+	std::string errorMsg;
+
+	if (GetUserWithId(snotifyUserID, user, errorMsg))
+	{
+		user->GetPlaylist(pLibraryArray, sizeOfLibary);
+
+		return true;
+	}
 	return false;
 }
 
-
-
-cSnotify::cSnotify()
+bool cSnotify::GetUsersSongLibraryAscendingByTitle(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
 {
+	if (GetUsersSongLibrary(snotifyUserID, pLibraryArray, sizeOfLibary))
+	{
+		Sorting::QuickSort<cSong>(&pLibraryArray[0], 0, sizeOfLibary - 1, AscendingSongName);
+		return true;
+	}
+	return false;
 }
 
-cSnotify::~cSnotify()
+bool cSnotify::GetUsersSongLibraryAscendingByArtist(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
 {
+	if (GetUsersSongLibrary(snotifyUserID, pLibraryArray, sizeOfLibary))
+	{
+		Sorting::QuickSort<cSong>(&pLibraryArray[0], 0, sizeOfLibary - 1, AscendingArtistName);
+		return true;
+	}
+	return false;
 }
+
 
 bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 {
@@ -128,7 +158,7 @@ bool cSnotify::AddSongToUserLibrary(unsigned int snotifyUserID, cSong* pNewSong,
 	cUser* userInList = nullptr;
 	if (GetUserWithId(snotifyUserID, userInList, errorString))
 	{
-		if(userInList->AddSong(pNewSong))
+		if (userInList->AddSong(pNewSong))
 		{
 			return true;
 		}
@@ -161,24 +191,91 @@ bool cSnotify::RemoveSongFromUserLibrary(unsigned int snotifyUserID, unsigned in
 
 bool cSnotify::UpdateRatingOnSong(unsigned int SnotifyUserID, unsigned int songUniqueID, unsigned int newRating)
 {
-	cUser* userInList = nullptr;
-	std::string errorString;
-
-	if (GetUserWithId(SnotifyUserID, userInList, errorString))
+	cUserSong* userSong = nullptr;
+	if (GetUserSongWithId(SnotifyUserID, songUniqueID, userSong))
 	{
-		cUserSong* userSong = nullptr;
-		unsigned int index;
-
-		if (userInList->FindSong(songUniqueID, userSong, index))
-		{
-			userSong->rating = newRating;
-			return true;
-		}
-	
-		std::cout << "Can't update rating. Song not found in playlist." << std::endl;
+		userSong->rating = newRating;
+		return true;
 	}
 
 	return false;
+}
+
+cSong* cSnotify::GetSong(unsigned int SnotifyUserID, unsigned int songUniqueID, std::string& errorString)
+{
+	cUserSong* userSong = nullptr;
+	if (GetUserSongWithId(SnotifyUserID, songUniqueID, userSong))
+	{
+		userSong->numberOfTimesPlayed++;
+		return userSong->mSong;
+	}
+
+	errorString = "Song not found in playlist.";
+
+	return nullptr;
+
+}
+
+bool cSnotify::GetCurrentSongRating(unsigned int snotifyUserID, unsigned int songUniqueID, unsigned int& songRating)
+{
+
+	cUserSong* userSong = nullptr;
+	if (GetUserSongWithId(snotifyUserID, songUniqueID, userSong))
+	{
+		songRating = userSong->rating;
+		return true;
+	}
+
+	return false;
+
+}
+
+bool cSnotify::GetCurrentSongNumberOfPlays(unsigned int snotifyUserID, unsigned int songUniqueID, unsigned int& numberOfPlays)
+{
+
+	cUserSong* userSong = nullptr;
+	if (GetUserSongWithId(snotifyUserID, songUniqueID, userSong))
+	{
+		numberOfPlays = userSong->numberOfTimesPlayed;
+		return true;
+	}
+
+	return false;
+}
+
+cPerson* cSnotify::FindUserBySIN(unsigned int SIN)
+{
+	if (mListOfUsers.getSize() == 0) return nullptr;
+
+	cUser* iteratedUser;
+	mListOfUsers.moveToFirst();
+
+	do
+	{
+		iteratedUser = mListOfUsers.getCurrent();
+
+		if (iteratedUser->mPerson->SIN == SIN)
+		{
+			return iteratedUser->mPerson;
+		}
+
+	} while (mListOfUsers.moveNext());
+
+
+	return nullptr;
+}
+
+cPerson* cSnotify::FindUserBySnotifyID(unsigned int SnotifyID)
+{
+	cUser* user = nullptr;
+	std::string errorMssg;
+
+	if (GetUserWithId(SnotifyID, user, errorMssg))
+	{
+		return user->mPerson;
+	}
+
+	return nullptr;
 }
 
 bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
@@ -251,6 +348,25 @@ bool cSnotify::GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string
 	} while (mListOfSongs.moveNext());
 
 	errorString = "Matching Song not found";
+
+	return false;
+}
+
+bool cSnotify::GetUserSongWithId(unsigned int userID, unsigned int songID, cUserSong*& userSong)
+{
+	cUser* userInList = nullptr;
+	std::string errorString;
+
+	if (GetUserWithId(userID, userInList, errorString))
+	{
+		unsigned int index;
+		if (userInList->FindSong(songID, userSong, index))
+		{
+			return true;
+		}
+
+		std::cout << "Song not found in user playlist." << std::endl;
+	}
 
 	return false;
 }

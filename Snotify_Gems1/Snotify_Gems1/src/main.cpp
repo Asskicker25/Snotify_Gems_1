@@ -79,22 +79,67 @@ int main(int argc, char* argv[])
 
 	snotify.AddSong(songToUpdate, errorMsg);
 
+	cSong* songFound = snotify.FindSong(songToUpdate->name, songToUpdate->artist);
+
+	if (snotify.FindSong(uniqueId))
+	{
+		std::cout << "Added Song : " << snotify.FindSong(uniqueId)->name << std::endl;
+	}
+
 	if (!snotify.AddSongToUserLibrary(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate, errorMsg))
 	{
 		std::cout << errorMsg << std::endl;
 	}
 
 	snotify.UpdateRatingOnSong(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), 3);
+	
+	unsigned int rating;
+
+	if (snotify.GetCurrentSongRating(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), rating))
+	{
+		std::cout << "Rating of " << songToUpdate->name << " : " << rating << std::endl;
+	}
+
+	unsigned int numOfPlays;
+
+	if (snotify.GetCurrentSongNumberOfPlays(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), numOfPlays))
+	{
+		std::cout << "Num of Plays : " << numOfPlays << std::endl;
+	}
+
+
+	cSong* songInUser = snotify.GetSong(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), errorMsg);
+	std::cout << (songInUser == nullptr ? errorMsg : songInUser->name )<< std::endl;
+
+	if (snotify.GetCurrentSongNumberOfPlays(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), numOfPlays))
+	{
+		std::cout << "Num of Plays : " << numOfPlays << std::endl;
+	}
+
+	snotify.AddSongToUserLibrary(listOfUsers[0].getSnotifyUniqueUserID(), musicGenerator.getRandomSong(), errorMsg);
+	snotify.AddSongToUserLibrary(listOfUsers[0].getSnotifyUniqueUserID(), musicGenerator.getRandomSong(), errorMsg);
+	snotify.AddSongToUserLibrary(listOfUsers[0].getSnotifyUniqueUserID(), musicGenerator.getRandomSong(), errorMsg);
+
+
+	cSong* songArray = nullptr;
+	unsigned int sizeOfSongArray = 0;
+	snotify.GetUsersSongLibrary(listOfUsers[0].getSnotifyUniqueUserID(), songArray, sizeOfSongArray);
+	snotify.GetUsersSongLibraryAscendingByTitle(listOfUsers[0].getSnotifyUniqueUserID(), songArray, sizeOfSongArray);
+
+	for (int i = 0; i < sizeOfSongArray; i++)
+	{
+		std::cout << "Song : " << songArray[i].name << std::endl;
+	}
 
 	if (!snotify.RemoveSongFromUserLibrary(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), errorMsg))
 	{
 		std::cout << errorMsg << std::endl;
 	}
 
-	snotify.UpdateRatingOnSong(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), 3);
+	songInUser = snotify.GetSong(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), errorMsg);
+	std::cout << (songInUser == nullptr ? errorMsg : songInUser->name) << std::endl;
 
-	
-	std::cout << "Added Song : " << snotify.FindSong(uniqueId)->name << std::endl;
+	snotify.UpdateRatingOnSong(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), 3);
 
 	songToUpdate = musicGenerator.getRandomSong();
 
@@ -104,12 +149,10 @@ int main(int argc, char* argv[])
 
 	std::cout << "Updated Song : " << snotify.FindSong(uniqueId)->name << std::endl;
 
+	
+
 	snotify.DeleteSong(uniqueId, errorMsg);
 
-	if (snotify.FindSong(uniqueId))
-	{
-		std::cout << "Added Song : " << snotify.FindSong(uniqueId)->name << std::endl;
-	}
 
 	return -1;
 }

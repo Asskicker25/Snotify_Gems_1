@@ -87,6 +87,7 @@ public:
 private:
 	bool GetUserWithId(unsigned int uniqueId, cUser*& outUser, std::string& errorString);
 	bool GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string& errorString);
+	bool GetUserSongWithId(unsigned int userID, unsigned int songID, cUserSong*& userSong);
 
 	LinkedList<cUser*> mListOfUsers;
 	LinkedList<cSong*> mListOfSongs;

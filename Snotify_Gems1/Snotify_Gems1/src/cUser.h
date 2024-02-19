@@ -15,6 +15,7 @@ public:
 	bool AddSong(cSong* song);
 	bool RemoveSong(unsigned int songUniqueId);
 	bool FindSong(unsigned int songUniqueId, cUserSong*& song, unsigned int& index);
+	bool GetPlaylist(cSong*& songArray, unsigned int& sizeOfArray);
 
 	cPerson* mPerson;
 
