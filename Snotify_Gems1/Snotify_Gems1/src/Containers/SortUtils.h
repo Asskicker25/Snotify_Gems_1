@@ -11,7 +11,7 @@ namespace Sorting
     }
 
     template <typename T>
-    int Partition(T* arr, int low, int high, bool (*compare)(T, T)) 
+    int Partition(T* arr, int low, int high, bool (*compare)(T&, T&)) 
     {
         T pivot = arr[high];
         int i = low - 1;
@@ -28,7 +28,7 @@ namespace Sorting
     }
 
     template <typename T>
-    void QuickSort(T* arr, int low, int high, bool (*compare)(T, T)) 
+    void QuickSort(T* arr, int low, int high, bool (*compare)(T&, T&)) 
     {
         if (low < high)
         {

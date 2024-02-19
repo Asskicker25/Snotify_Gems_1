@@ -19,8 +19,8 @@ bool cMusicGenerator::LoadMusicInformation(std::string musicFileName, std::strin
 {
 	if (LoadFromCSV(musicFileName, errorString))
 	{
-		SortSongs();
-		DeleteDuplicates();
+		//SortSongs();
+		//DeleteDuplicates();
 		std::cout << "Size : " << mListOfSongs.getSize() << std::endl;
 
 		/*for (int i = 0; i < mListOfSongs.getSize(); i++)
@@ -118,13 +118,19 @@ bool cMusicGenerator::LoadFromCSV(std::string musicFileName, std::string& errorS
 
 void cMusicGenerator::AddSong(const std::string& songName, const std::string& artist)
 {
-	cSong* newSong = new cSong();
+	unsigned int hashValue = Hashing((songName + artist).c_str());
 
-	newSong->name = songName;
-	newSong->artist = artist;
-	newSong->uniqueID = Hashing((songName + artist).c_str());
+	if (!IsDuplicate(hashValue))
+	{
+		cSong* newSong = new cSong();
 
-	mListOfSongs.addAtEnd(newSong);
+		newSong->name = songName;
+		newSong->artist = artist;
+		newSong->uniqueID = hashValue;
+
+		mListOfSongs.addAtEnd(newSong);
+		mSongHashValues.addAtEnd(hashValue);
+	}
 }
 
 unsigned int cMusicGenerator::Hashing(const char* str)
@@ -156,6 +162,21 @@ void cMusicGenerator::DeleteDuplicates()
 	{
 		mListOfSongs.removeAt(indicesToRemove.getAt(i) - (i));
 	}
+}
+
+bool cMusicGenerator::IsDuplicate(unsigned int hashValue)
+{
+	unsigned int size = mSongHashValues.getSize();
+
+	for (int i = 0; i < size; i++)
+	{
+		if (mSongHashValues.getAt(i) == hashValue)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void cMusicGenerator::SortSongs()
@@ -194,6 +215,6 @@ int cMusicGenerator::QuickSortPartition(SmartArray<cSong*>& songs, int low, int 
 	cSong* temp = songs.getAt(i + 1);
 	songs.addAtIndex(i + 1, songs.getAt(high));
 	songs.addAtIndex(high, temp);
-	
+
 	return i + 1;
 }

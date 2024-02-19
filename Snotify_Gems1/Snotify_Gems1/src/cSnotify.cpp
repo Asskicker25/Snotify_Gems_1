@@ -4,22 +4,54 @@
 #include "cMusicGenerator.h"
 #include "Containers/SortUtils.h"
 
-bool AscendingSongName(cSong a, cSong b)
+bool AscendingString(std::string& a, std::string& b)
 {
-	char lhs = a.name.c_str()[0];
-	char rhs = b.name.c_str()[0];
+	const char* lhs = a.c_str();
+	const char* rhs = b.c_str();
 
-	return lhs < rhs;
+	while (*lhs && *rhs)
+	{
+		if (*lhs != *rhs)
+		{
+			return *lhs < *rhs;
+		}
+		++lhs;
+		++rhs;
+	}
+
+	return *lhs == '\0' && *rhs != '\0';
 }
 
-bool AscendingArtistName(cSong a, cSong b)
+bool AscendingSongName(cSong& a, cSong& b)
 {
-	char lhs = a.artist.c_str()[0];
-	char rhs = b.artist.c_str()[0];
-
-	return lhs < rhs;
+	return AscendingString(a.name, b.name);
 }
 
+bool AscendingArtistName(cSong& a, cSong& b)
+{
+	return AscendingString(a.artist, b.artist);
+}
+
+bool AscendingSnotifyId(cPerson& lhs, cPerson& rhs)
+{
+	return lhs.getSnotifyUniqueUserID() < rhs.getSnotifyUniqueUserID();
+}
+
+bool AscendingUserFirstName(cPerson& lhs, cPerson& rhs)
+{
+	std::string lhsString = (lhs.first + lhs.middle + lhs.last);
+	std::string rhsString = (rhs.first + rhs.middle + rhs.last);
+
+	return AscendingString(lhsString, rhsString);
+}
+
+bool AscendingUserLastName(cPerson& lhs, cPerson& rhs)
+{
+	std::string lhsString = (lhs.last + lhs.first + lhs.middle);
+	std::string rhsString = (rhs.last + rhs.first + rhs.middle);
+
+	return AscendingString(lhsString, rhsString);
+}
 
 
 cSnotify::cSnotify()
@@ -45,40 +77,6 @@ cSong* cSnotify::FindSong(unsigned int uniqueID)
 	GetSongWithId(uniqueID, songInList, errorMsg);
 
 	return songInList;
-}
-
-bool cSnotify::GetUsersSongLibrary(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
-{
-	cUser* user = nullptr;
-	std::string errorMsg;
-
-	if (GetUserWithId(snotifyUserID, user, errorMsg))
-	{
-		user->GetPlaylist(pLibraryArray, sizeOfLibary);
-
-		return true;
-	}
-	return false;
-}
-
-bool cSnotify::GetUsersSongLibraryAscendingByTitle(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
-{
-	if (GetUsersSongLibrary(snotifyUserID, pLibraryArray, sizeOfLibary))
-	{
-		Sorting::QuickSort<cSong>(&pLibraryArray[0], 0, sizeOfLibary - 1, AscendingSongName);
-		return true;
-	}
-	return false;
-}
-
-bool cSnotify::GetUsersSongLibraryAscendingByArtist(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
-{
-	if (GetUsersSongLibrary(snotifyUserID, pLibraryArray, sizeOfLibary))
-	{
-		Sorting::QuickSort<cSong>(&pLibraryArray[0], 0, sizeOfLibary - 1, AscendingArtistName);
-		return true;
-	}
-	return false;
 }
 
 
@@ -278,6 +276,42 @@ cPerson* cSnotify::FindUserBySnotifyID(unsigned int SnotifyID)
 	return nullptr;
 }
 
+
+bool cSnotify::GetUsersSongLibrary(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
+{
+	cUser* user = nullptr;
+	std::string errorMsg;
+
+	if (GetUserWithId(snotifyUserID, user, errorMsg))
+	{
+		user->GetPlaylist(pLibraryArray, sizeOfLibary);
+
+		return true;
+	}
+	return false;
+}
+
+bool cSnotify::GetUsersSongLibraryAscendingByTitle(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
+{
+	if (GetUsersSongLibrary(snotifyUserID, pLibraryArray, sizeOfLibary))
+	{
+		Sorting::QuickSort<cSong>(&pLibraryArray[0], 0, sizeOfLibary - 1, AscendingSongName);
+		return true;
+	}
+	return false;
+}
+
+bool cSnotify::GetUsersSongLibraryAscendingByArtist(unsigned int snotifyUserID, cSong*& pLibraryArray, unsigned int& sizeOfLibary)
+{
+	if (GetUsersSongLibrary(snotifyUserID, pLibraryArray, sizeOfLibary))
+	{
+		Sorting::QuickSort<cSong>(&pLibraryArray[0], 0, sizeOfLibary - 1, AscendingArtistName);
+		return true;
+	}
+	return false;
+}
+
+
 bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 {
 	sizeOfUserArray = mListOfUsers.getSize();
@@ -298,6 +332,135 @@ bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 
 	} while (mListOfUsers.movePrevious());
 
+
+	return true;
+}
+
+bool cSnotify::GetUsersByID(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
+{
+	if (GetUsers(pAllTheUsers, sizeOfUserArray))
+	{
+		Sorting::QuickSort<cPerson>(&pAllTheUsers[0], 0, sizeOfUserArray - 1, AscendingSnotifyId);
+		return true;
+	}
+
+	return false;
+}
+
+bool cSnotify::FindUsersFirstName(std::string firstName, cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
+{
+	sizeOfUserArray = mListOfUsers.getSize();
+
+	if (sizeOfUserArray == 0) return false;
+
+	if (pAllTheUsers != nullptr) { delete[] pAllTheUsers; }
+
+	pAllTheUsers = new cPerson[sizeOfUserArray];
+
+	mListOfUsers.moveToLast();
+
+	unsigned int index = 0;
+	unsigned int sizeOfFirstNames = 0;
+
+	cPerson* iteratedPerson = nullptr;
+
+	do
+	{
+		iteratedPerson = mListOfUsers.getCurrent()->mPerson;
+
+		if (cMusicGenerator::Hashing( (iteratedPerson->first).c_str()) == cMusicGenerator::Hashing( (firstName).c_str()))
+		{
+			pAllTheUsers[sizeOfFirstNames] = *mListOfUsers.getCurrent()->mPerson;
+			sizeOfFirstNames++;
+
+		}
+
+		index++;
+
+	} while (mListOfUsers.movePrevious());
+
+	sizeOfUserArray = sizeOfFirstNames;
+
+	if (sizeOfUserArray == 0) { return false; }
+
+	Sorting::QuickSort<cPerson>(&pAllTheUsers[0], 0, sizeOfUserArray - 1, AscendingUserFirstName);
+
+	return true;
+}
+
+bool cSnotify::FindUsersLastName(std::string lastName, cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
+{
+	sizeOfUserArray = mListOfUsers.getSize();
+
+	if (sizeOfUserArray == 0) return false;
+
+	pAllTheUsers = new cPerson[sizeOfUserArray];
+
+	mListOfUsers.moveToLast();
+
+	unsigned int index = 0;
+	unsigned int sizeOfFirstNames = 0;
+
+	cPerson* iteratedPerson = nullptr;
+
+	do
+	{
+		iteratedPerson = mListOfUsers.getCurrent()->mPerson;
+
+		if (cMusicGenerator::Hashing((iteratedPerson->last).c_str()) == cMusicGenerator::Hashing((lastName).c_str()))
+		{
+			pAllTheUsers[sizeOfFirstNames] = *mListOfUsers.getCurrent()->mPerson;
+			sizeOfFirstNames++;
+		}
+
+		index++;
+
+	} while (mListOfUsers.movePrevious());
+
+	sizeOfUserArray = sizeOfFirstNames;
+
+	if (sizeOfUserArray == 0) { return false; }
+
+	Sorting::QuickSort<cPerson>(&pAllTheUsers[0], 0, sizeOfUserArray - 1, AscendingUserLastName);
+
+	return true;
+}
+
+bool cSnotify::FindUsersFirstLastNames(std::string firstName, std::string lastName, cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
+{
+	sizeOfUserArray = mListOfUsers.getSize();
+
+	if (sizeOfUserArray == 0) return false;
+
+	pAllTheUsers = new cPerson[sizeOfUserArray];
+
+	mListOfUsers.moveToLast();
+
+	unsigned int index = 0;
+	unsigned int sizeOfFirstNames = 0;
+
+	cPerson* iteratedPerson = nullptr;
+
+	do
+	{
+		iteratedPerson = mListOfUsers.getCurrent()->mPerson;
+
+		if (cMusicGenerator::Hashing((iteratedPerson->first + iteratedPerson->last).c_str()) == 
+			cMusicGenerator::Hashing((firstName + lastName).c_str()))
+		{
+			pAllTheUsers[sizeOfFirstNames] = *mListOfUsers.getCurrent()->mPerson;
+			sizeOfFirstNames++;
+		}
+
+		index++;
+
+	} while (mListOfUsers.movePrevious());
+
+	sizeOfUserArray = sizeOfFirstNames;
+
+	if (sizeOfUserArray == 0) { return false; }
+
+	Sorting::QuickSort<cPerson>(&pAllTheUsers[0], 0, sizeOfUserArray - 1, AscendingUserLastName);
 
 	return true;
 }

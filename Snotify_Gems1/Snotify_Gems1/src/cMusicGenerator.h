@@ -27,6 +27,7 @@ public:
 
 private:
 	bool LoadFromCSV(std::string musicFileName, std::string& errorString);
+	bool IsDuplicate(unsigned int hashValue);
 
 	void SortSongs();
 	void DeleteDuplicates();
@@ -38,6 +39,7 @@ private:
 	void QuickSort(SmartArray<cSong*>& songs, int low, int high);
 
 	SmartArray<cSong*> mListOfSongs;
+	SmartArray<unsigned int> mSongHashValues;
 
 };
 
