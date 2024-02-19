@@ -3,6 +3,7 @@
 
 #include "cPerson.h"
 #include "cSong.h"
+#include "cUser.h"
 
 #include "Containers/LinkedList.h"
 
@@ -84,10 +85,10 @@ public:
 
 
 private:
-	bool GetUserWithId(unsigned int uniqueId, cPerson*& outPerson, std::string& errorString);
+	bool GetUserWithId(unsigned int uniqueId, cUser*& outUser, std::string& errorString);
 	bool GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string& errorString);
 
-	LinkedList<cPerson*> mListOfUsers;
+	LinkedList<cUser*> mListOfUsers;
 	LinkedList<cSong*> mListOfSongs;
 
 };

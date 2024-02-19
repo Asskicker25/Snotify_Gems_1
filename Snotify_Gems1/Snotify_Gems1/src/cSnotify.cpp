@@ -54,21 +54,21 @@ cSnotify::~cSnotify()
 
 bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 {
-	mListOfUsers.insertBeforeCurrent(pPerson);
+	mListOfUsers.insertBeforeCurrent(new cUser(pPerson));
 
 	return true;
 }
 
 bool cSnotify::UpdateUser(cPerson* pPerson, std::string& errorString)
 {
-	cPerson* personInList = nullptr;
-	if (GetUserWithId(pPerson->getSnotifyUniqueUserID(), personInList, errorString))
+	cUser* userInList = nullptr;
+	if (GetUserWithId(pPerson->getSnotifyUniqueUserID(), userInList, errorString))
 	{
-		if (personInList->SIN == pPerson->SIN)
+		if (userInList->mPerson->SIN == pPerson->SIN)
 		{
-			mListOfUsers.updateCurrent(pPerson);
+			delete userInList->mPerson;
 
-			delete personInList;
+			userInList->mPerson = pPerson;
 
 			return true;
 		}
@@ -79,8 +79,8 @@ bool cSnotify::UpdateUser(cPerson* pPerson, std::string& errorString)
 
 bool cSnotify::DeleteUser(unsigned int SnotifyUserID, std::string& errorString)
 {
-	cPerson* personInList = nullptr;
-	if (GetUserWithId(SnotifyUserID, personInList, errorString))
+	cUser* userInList = nullptr;
+	if (GetUserWithId(SnotifyUserID, userInList, errorString))
 	{
 		mListOfUsers.deleteAtCurrent();
 		return true;
@@ -125,6 +125,59 @@ bool cSnotify::DeleteSong(unsigned int UniqueSongID, std::string& errorString)
 
 bool cSnotify::AddSongToUserLibrary(unsigned int snotifyUserID, cSong* pNewSong, std::string& errorString)
 {
+	cUser* userInList = nullptr;
+	if (GetUserWithId(snotifyUserID, userInList, errorString))
+	{
+		if(userInList->AddSong(pNewSong))
+		{
+			return true;
+		}
+		else
+		{
+			errorString = "Can't add song. It already exists in playlist.";
+		}
+	}
+
+	return false;
+}
+
+bool cSnotify::RemoveSongFromUserLibrary(unsigned int snotifyUserID, unsigned int SnotifySongID, std::string& errorString)
+{
+	cUser* userInList = nullptr;
+	if (GetUserWithId(snotifyUserID, userInList, errorString))
+	{
+		if (userInList->RemoveSong(SnotifySongID))
+		{
+			return true;
+		}
+		else
+		{
+			errorString = "Can't remove song. It doesn't exist in playlist.";
+		}
+	}
+
+	return false;
+}
+
+bool cSnotify::UpdateRatingOnSong(unsigned int SnotifyUserID, unsigned int songUniqueID, unsigned int newRating)
+{
+	cUser* userInList = nullptr;
+	std::string errorString;
+
+	if (GetUserWithId(SnotifyUserID, userInList, errorString))
+	{
+		cUserSong* userSong = nullptr;
+		unsigned int index;
+
+		if (userInList->FindSong(songUniqueID, userSong, index))
+		{
+			userSong->rating = newRating;
+			return true;
+		}
+	
+		std::cout << "Can't update rating. Song not found in playlist." << std::endl;
+	}
+
 	return false;
 }
 
@@ -142,7 +195,7 @@ bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 
 	do
 	{
-		pAllTheUsers[index] = *mListOfUsers.getCurrent();
+		pAllTheUsers[index] = *mListOfUsers.getCurrent()->mPerson;
 
 		index++;
 
@@ -152,20 +205,20 @@ bool cSnotify::GetUsers(cPerson*& pAllTheUsers, unsigned int& sizeOfUserArray)
 	return true;
 }
 
-bool cSnotify::GetUserWithId(unsigned int uniqueId, cPerson*& outPerson, std::string& errorString)
+bool cSnotify::GetUserWithId(unsigned int uniqueId, cUser*& outUser, std::string& errorString)
 {
 	if (mListOfUsers.getSize() == 0) return false;
 
-	cPerson* iteratedPerson;
+	cUser* iteratedUser;
 	mListOfUsers.moveToFirst();
 
 	do
 	{
-		iteratedPerson = mListOfUsers.getCurrent();
+		iteratedUser = mListOfUsers.getCurrent();
 
-		if (iteratedPerson->getSnotifyUniqueUserID() == uniqueId)
+		if (iteratedUser->mPerson->getSnotifyUniqueUserID() == uniqueId)
 		{
-			outPerson = iteratedPerson;
+			outUser = iteratedUser;
 
 			return true;
 		}

@@ -79,6 +79,21 @@ int main(int argc, char* argv[])
 
 	snotify.AddSong(songToUpdate, errorMsg);
 
+	if (!snotify.AddSongToUserLibrary(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate, errorMsg))
+	{
+		std::cout << errorMsg << std::endl;
+	}
+
+	snotify.UpdateRatingOnSong(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), 3);
+
+	if (!snotify.RemoveSongFromUserLibrary(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), errorMsg))
+	{
+		std::cout << errorMsg << std::endl;
+	}
+
+	snotify.UpdateRatingOnSong(listOfUsers[0].getSnotifyUniqueUserID(), songToUpdate->getUniqueID(), 3);
+
+	
 	std::cout << "Added Song : " << snotify.FindSong(uniqueId)->name << std::endl;
 
 	songToUpdate = musicGenerator.getRandomSong();
