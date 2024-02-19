@@ -47,6 +47,7 @@ public:
 	// NOTE: This updates the "numberOfTimesPlayed" in THIS USER'S playlist-library
 	// ****************************************************************************
 	cSong* GetSong(unsigned int SnotifyUserID, unsigned int songUniqueID, std::string& errorString);
+	cSong* GetRandomSong();
 	
 	// Note that the songRating is "returned" by reference. 
 	// If it can't find a match (i.e. returns false), then the rating isn't valid. 
@@ -88,6 +89,8 @@ private:
 	bool GetUserWithId(unsigned int uniqueId, cUser*& outUser, std::string& errorString);
 	bool GetSongWithId(unsigned int uniqueId, cSong*& outSong, std::string& errorString);
 	bool GetUserSongWithId(unsigned int userID, unsigned int songID, cUserSong*& userSong);
+
+	int GetRandomIntNumber(int minValue, int maxValue);
 
 	LinkedList<cUser*> mListOfUsers;
 	LinkedList<cSong*> mListOfSongs;

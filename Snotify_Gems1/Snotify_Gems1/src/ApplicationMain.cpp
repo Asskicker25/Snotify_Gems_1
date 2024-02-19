@@ -466,17 +466,22 @@ void PrintUserPlaylistHandling()
 
 		for (int i = 0; i < input; i++)
 		{
-			song = musicGenerator.getRandomSong();
+			song = snotify.GetRandomSong();
+
+			if (song != nullptr)
+			{
+
+				if (snotify.AddSongToUserLibrary(userId, song, errorMsg))
+				{
+					PrintSongInfo(*song);
+					printf("\n");
+				}
+				else
+				{
+					PrintErrorMessage(errorMsg);
+				}
+			}
 			
-			if (snotify.AddSongToUserLibrary(userId, song, errorMsg))
-			{
-				PrintSongInfo(*song);
-				printf("\n");
-			}
-			else
-			{
-				PrintErrorMessage(errorMsg);
-			}
 		}
 
 		break;
@@ -581,11 +586,21 @@ void PrintUserPlaylistHandling()
 
 		if (snotify.GetUsersSongLibrary(userId, song, sizeOfArray))
 		{
+			if (sizeOfArray == 0)
+			{
+				printf("No Song Available in Library\n");
+				break;
+			}
+
 			for (int i = 0; i < sizeOfArray; i++)
 			{
 				PrintSongInfo(song[i]);
 				printf("\n");
 			}
+		}
+		else
+		{
+			printf("User With ID doesn't exist\n");
 		}
 
 		break;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 #include "Profiler.h"
 #include "cSnotify.h"
 #include "cMusicGenerator.h"
@@ -82,7 +83,7 @@ cSong* cSnotify::FindSong(unsigned int uniqueID)
 
 bool cSnotify::AddUser(cPerson* pPerson, std::string& errorString)
 {
-	mListOfUsers.insertBeforeCurrent(new cUser(pPerson));
+	mListOfUsers.insertBeforeCurrent(new cUser(pPerson,this));
 
 	return true;
 }
@@ -158,14 +159,22 @@ bool cSnotify::AddSongToUserLibrary(unsigned int snotifyUserID, cSong* pNewSong,
 	cUser* userInList = nullptr;
 	if (GetUserWithId(snotifyUserID, userInList, errorString))
 	{
-		if (userInList->AddSong(pNewSong))
+		if (GetSongWithId(pNewSong->getUniqueID(), pNewSong, errorString))
 		{
-			return true;
+			if (userInList->AddSong(pNewSong))
+			{
+				return true;
+			}
+			else
+			{
+				errorString = "Can't add song. It already exists in playlist.";
+			}
 		}
 		else
 		{
-			errorString = "Can't add song. It already exists in playlist.";
+			errorString = "Can't add song. It doesn't exist in snotify.";
 		}
+		
 	}
 
 	return false;
@@ -214,6 +223,33 @@ cSong* cSnotify::GetSong(unsigned int SnotifyUserID, unsigned int songUniqueID, 
 
 	return nullptr;
 
+}
+
+cSong* cSnotify::GetRandomSong()
+{
+	unsigned int size = mListOfSongs.getSize();
+
+	if (size == 0)
+	{
+		std::cout << "No Songs Added To Spotify" << std::endl;
+		return nullptr;
+	}
+
+	int randomIndex = GetRandomIntNumber(0, size - 1);
+	int currentIndex = 0;
+
+	mListOfSongs.moveToFirst();
+
+	do
+	{
+		if (currentIndex == randomIndex)
+		{
+			return mListOfSongs.getCurrent();
+		}
+
+	} while (mListOfSongs.moveNext());
+
+	return nullptr;
 }
 
 bool cSnotify::GetCurrentSongRating(unsigned int snotifyUserID, unsigned int songUniqueID, unsigned int& songRating)
@@ -544,4 +580,13 @@ bool cSnotify::GetUserSongWithId(unsigned int userID, unsigned int songID, cUser
 	}
 
 	return false;
+}
+
+int cSnotify::GetRandomIntNumber(int minValue, int maxValue)
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> distribution(minValue, maxValue);
+
+	return distribution(gen);
 }

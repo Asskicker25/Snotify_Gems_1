@@ -1,4 +1,5 @@
 #include "cUser.h"
+#include "cSnotify.h"
 
 bool cUser::AddSong(cSong* song)
 {
@@ -55,10 +56,22 @@ bool cUser::GetPlaylist(cSong*& songArray, unsigned int& sizeOfArray)
 	songArray = new cSong[sizeOfArray];
 
 	cUserSong* iteratedSong = nullptr;
+	cSong* itSong;
+
 
 	for (int i = 0; i < sizeOfArray; i++)
 	{
 		iteratedSong = mPlaylist.getAt(i);
+		itSong = mSnotify->FindSong(iteratedSong->mSong->getUniqueID());
+
+		if (itSong == nullptr)
+		{
+			mPlaylist.removeAt(i);
+			i--;
+			sizeOfArray--;
+			continue;
+		}
+
 		songArray[i] = *iteratedSong->mSong;
 		songArray[i].rating = iteratedSong->rating;
 		songArray[i].numberOfTimesPlayed = iteratedSong->numberOfTimesPlayed;
