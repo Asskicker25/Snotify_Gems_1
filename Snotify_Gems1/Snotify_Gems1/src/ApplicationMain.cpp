@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 		"Assets/Surname/Names_2010Census.csv",
 		"Assets/StreetName/Street_Names.csv", errorMsg);
 
-	musicGenerator.LoadMusicInformation("Assets/Billboard/hot_stuff_2 - Copy.csv", errorMsg);
+	musicGenerator.LoadMusicInformation("Assets/Billboard/hot_stuff_2.csv", errorMsg);
 
 	do
 	{

@@ -21,7 +21,7 @@ bool cMusicGenerator::LoadMusicInformation(std::string musicFileName, std::strin
 	{
 		//SortSongs();
 		//DeleteDuplicates();
-		std::cout << "Size : " << mListOfSongs.getSize() << std::endl;
+		//std::cout << "Size : " << mListOfSongs.getSize() << std::endl;
 
 		/*for (int i = 0; i < mListOfSongs.getSize(); i++)
 		{
@@ -55,11 +55,9 @@ cSong* cMusicGenerator::findSong(std::string songName, std::string artist)
 
 int cMusicGenerator::GetRandomIntNumber(int minValue, int maxValue)
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> distribution(minValue, maxValue);
+	unsigned int output = minValue + (rand() % static_cast<unsigned int>(maxValue - minValue + 1));
 
-	return distribution(gen);
+	return output;
 }
 
 bool cMusicGenerator::LoadFromCSV(std::string musicFileName, std::string& errorString)
@@ -112,7 +110,7 @@ bool cMusicGenerator::LoadFromCSV(std::string musicFileName, std::string& errorS
 		AddSong(songName, artist);
 
 	}
-	std::cout << "Line : " << lineCount << std::endl;
+	//std::cout << "Line : " << lineCount << std::endl;
 	return true;
 }
 

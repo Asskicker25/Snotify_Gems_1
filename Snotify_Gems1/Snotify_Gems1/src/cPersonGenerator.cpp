@@ -232,21 +232,15 @@ bool cPersonGenerator::ReadStreetFile(const std::string& fileName)
 
 int cPersonGenerator::GetRandomIntNumber(int minValue, int maxValue)
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> distribution(minValue, maxValue);
+	unsigned int output = minValue + (rand() % static_cast<unsigned int>(maxValue - minValue + 1));
 
-	return distribution(gen);
+	return output;
 }
 
 
 char cPersonGenerator::GetRandomAlphabet()
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> letterDistribution(0, 25);
-
-	return ('A' + letterDistribution(gen));
+	return ('A' + GetRandomIntNumber(0, 25));
 }
 
 unsigned int cPersonGenerator::GetSINNumber()

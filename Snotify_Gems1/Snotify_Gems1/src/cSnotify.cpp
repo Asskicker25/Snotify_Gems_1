@@ -246,6 +246,7 @@ cSong* cSnotify::GetRandomSong()
 		{
 			return mListOfSongs.getCurrent();
 		}
+		currentIndex++;
 
 	} while (mListOfSongs.moveNext());
 
@@ -584,9 +585,7 @@ bool cSnotify::GetUserSongWithId(unsigned int userID, unsigned int songID, cUser
 
 int cSnotify::GetRandomIntNumber(int minValue, int maxValue)
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> distribution(minValue, maxValue);
+	unsigned int output = minValue + (rand() % static_cast<unsigned int>(maxValue - minValue + 1));
 
-	return distribution(gen);
+	return output;
 }
